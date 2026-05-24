@@ -12,9 +12,58 @@ jobs:
     runs-on: ubuntu-latest
     environment: Master
     if: github.event.pull_request.merged == true
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Deploy to Master Environment
-        run: echo "Deploying to Master Environment..."
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore Spoolarr.sln
+
+      - name: Build solution
+        run: dotnet build Spoolarr.sln --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test Spoolarr.sln --no-build --configuration Release --verbosity normal
+
+      - name: Publish API
+        run: dotnet publish src/API/API.csproj --configuration Release --output ./publish
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -f docker/Dockerfile.api \
+            -t spoolarr-api:latest \
+            -t spoolarr-api:${{ github.sha }} \
+            .
+
+      - name: Deploy to Master environment
+        run: |
+          echo "Deploying spoolarr-api:latest to master environment"
+          echo "SHA: ${{ github.sha }}"
+          echo "Branch: ${{ github.head_ref }}"
+          # Replace this with your actual deploy command
+          # e.g. ssh, docker pull, docker compose up, etc.
+
+      - name: Delete merged branch
+        if: github.event.pull_request.merged == true
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            try {
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `heads/${branch}`
+              });
+              console.log(`Deleted branch: ${branch}`);
+            } catch (error) {
+              console.log(`Could not delete branch ${branch}: ${error.message}`);
+            }
