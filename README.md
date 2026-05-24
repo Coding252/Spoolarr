@@ -48,14 +48,6 @@ No subscriptions. No cloud. No vendor lock-in. Runs entirely on your local netwo
 
 ---
 
-## Scan Flow
-
-![Spoolarr NFC Scan Flow](docs/spoolarr-nfc-scan-flow.png)
-
-> Full interactive version — open [`docs/spoolarr-nfc-scan-flow.html`](docs/spoolarr-nfc-scan-flow.html) in any browser.
-
----
-
 ## Project Structure
 
 ```
