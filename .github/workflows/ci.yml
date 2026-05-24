@@ -1,4 +1,4 @@
-name: CI\xe2\x80\x94Build and Test
+name: CI
 
 on:
   pull_request:
@@ -17,16 +17,5 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Restore dependencies
-        run: dotnet restore Spoolarr.sln
-
-      - name: Build solution
-        run: dotnet build Spoolarr.sln --no-restore --configuration Release
-
-      - name: Run tests
-        run: dotnet test Spoolarr.sln --no-build --configuration Release --verbosity normal
+      - name: Placeholder - no build yet
+        run: echo "CI placeholder - dotnet build will be added in M0"
