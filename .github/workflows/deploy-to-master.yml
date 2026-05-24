@@ -7,10 +7,12 @@ on:
     types:
       - closed
 
+permissions:
+  contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: Master
     if: github.event.pull_request.merged == true
     steps:
       - name: Checkout code
