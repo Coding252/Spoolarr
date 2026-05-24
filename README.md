@@ -127,13 +127,100 @@ Then open `https://spoolarr.local` (or your Docker host IP) in your browser.
 
 ## Roadmap
 
-- [ ] Phase 1 — NFC spool identity
-- [ ] Phase 2 — Bambu Lab MQTT integration (no AMS)
-- [ ] Phase 3 — Gram tracking per spool
-- [ ] Phase 4 — Docker stack
-- [ ] Phase 5 — AMS multi-slot support
-- [ ] Phase 6 — Low stock alerts (ntfy / webhook)
-- [ ] Phase 7 — Print history & stats dashboard
+Each milestone has its own detailed README with tasks, code snippets, and definition of done.
+
+| Milestone | Description | Status |
+|---|---|---|
+| [M0 — Project Bootstrap](docs/milestones/M0-bootstrap/README.md) | Solution setup, Docker, Caddy, EF Core, health endpoint | ⬜ Not started |
+| [M1 — Data Model](docs/milestones/M1-data-model/README.md) | `Spool` + `PrintJob` entities, migrations, repositories, seed data | ⬜ Not started |
+| [M2 — Spool API](docs/milestones/M2-spool-api/README.md) | REST endpoints for spool management | ⬜ Not started |
+| [M3 — NFC Scan Flow](docs/milestones/M3-nfc-scan/README.md) | Scan endpoint, `NfcScanService`, SignalR real-time push | ⬜ Not started |
+| [M4 — Bambu MQTT](docs/milestones/M4-bambu-mqtt/README.md) | MQTT listener, print-finish event, auto gram deduction | ⬜ Not started |
+| [M5 — Web UI](docs/milestones/M5-web-ui/README.md) | Dashboard, scan page, Web NFC, QR fallback, register form | ⬜ Not started |
+| [M6 — Alerts](docs/milestones/M6-alerts/README.md) | Low stock threshold check, ntfy / webhook notifications | ⬜ Not started |
+| [M7 — AMS Support](docs/milestones/M7-ams/README.md) | Multi-slot mapping, AMS MQTT parsing, slot UI | ⬜ Not started |
+
+### Task checklist
+
+<details>
+<summary>Milestone 0 — Project Bootstrap</summary>
+
+- [ ] Create solution `Spoolarr.sln` with `Spoolarr.Api` and `Spoolarr.Web` projects
+- [ ] Set up Docker + docker-compose skeleton
+- [ ] Configure Caddy for HTTPS
+- [ ] Set up EF Core + SQLite + `FilamentDbContext`
+- [ ] Basic health check endpoint `GET /health`
+
+</details>
+
+<details>
+<summary>Milestone 1 — Data Model</summary>
+
+- [ ] `Spool` entity + migration
+- [ ] `PrintJob` entity + migration
+- [ ] `SpoolRepository` + `PrintJobRepository`
+- [ ] Seed data for testing
+
+</details>
+
+<details>
+<summary>Milestone 2 — Spool API</summary>
+
+- [ ] `GET /api/spools` — list all spools
+- [ ] `GET /api/spools/{id}` — get single spool
+- [ ] `POST /api/spools` — register new spool
+- [ ] `PATCH /api/spools/{id}/activate` — set active spool
+- [ ] `PATCH /api/spools/{id}/weight` — update weight manually
+
+</details>
+
+<details>
+<summary>Milestone 3 — NFC Scan Flow</summary>
+
+- [ ] `POST /api/spools/scan` — receives tag UID, routes to register or activate
+- [ ] `NfcScanService` — lookup by UID, return spool or "unknown tag"
+- [ ] `NfcScanHub` SignalR — push scan result to browser in real time
+
+</details>
+
+<details>
+<summary>Milestone 4 — Bambu MQTT</summary>
+
+- [ ] `MqttListenerService` as `IHostedService`
+- [ ] Connect to printer on LAN using MQTTnet
+- [ ] Parse print-finish event, extract grams used
+- [ ] Deduct grams from active spool via `SpoolService`
+- [ ] Log `PrintJob` to DB
+
+</details>
+
+<details>
+<summary>Milestone 5 — Web UI</summary>
+
+- [ ] Spool list dashboard
+- [ ] Spool detail page
+- [ ] NFC scan page (Web NFC + QR fallback for iOS)
+- [ ] Register spool form
+- [ ] Active spool indicator
+
+</details>
+
+<details>
+<summary>Milestone 6 — Alerts</summary>
+
+- [ ] Threshold check after every gram deduction
+- [ ] Webhook / ntfy push notification
+
+</details>
+
+<details>
+<summary>Milestone 7 — AMS Support</summary>
+
+- [ ] Slot-to-spool mapping model
+- [ ] Multi-slot MQTT parsing
+- [ ] UI slot management
+
+</details>
 
 ---
 
