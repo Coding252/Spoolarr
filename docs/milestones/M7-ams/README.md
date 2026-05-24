@@ -1,12 +1,12 @@
 # Milestone 7 — AMS Multi-Slot Support
 
-> Extend Spoolarr to support the Bambu Lab AMS (Automatic Material System) — track up to 4 filament slots simultaneously and map each MQTT print event to the correct spool.
+> Extend Spoolarr to support the Bambu Lab AMS — track up to 4 filament slots simultaneously and map each MQTT print event to the correct spool.
 
 ---
 
 ## Goal
 
-By the end of this milestone, each AMS slot is mapped to a registered spool. When a print finishes, the gram deduction goes to the correct spool based on which slot was used — not just the single "active" spool.
+By the end of this milestone each AMS slot is mapped to a registered spool. When a print finishes the gram deduction goes to the correct spool based on which slot was used — not just the single active spool.
 
 ---
 
@@ -20,226 +20,91 @@ By the end of this milestone, each AMS slot is mapped to a registered spool. Whe
 
 ## Tasks
 
-- [ ] Slot-to-spool mapping model
-- [ ] Multi-slot MQTT parsing
-- [ ] UI slot management
+### Models
+- [ ] Create `AmsSlot` entity class inside `Models/`
+- [ ] Add `Id` field — Guid, primary key
+- [ ] Add `SlotIndex` field — int, values 0–3
+- [ ] Add `AmsUnit` field — int, default 0 (for multi-AMS setups)
+- [ ] Add `SpoolId` field — Guid, nullable, foreign key to `Spool`
+- [ ] Add `Spool` — navigation property, nullable
+- [ ] Add `LoadedAt` field — DateTime, nullable
+
+### Database
+- [ ] Add `DbSet<AmsSlot>` to `FilamentDbContext`
+- [ ] Configure foreign key from `AmsSlot.SpoolId` to `Spool.Id`
+- [ ] Set foreign key as nullable — slot can be empty
+- [ ] Run `dotnet ef migrations add AddAmsSlots`
+- [ ] Run `dotnet ef database update`
+- [ ] Confirm `AmsSlots` table is created
+
+### Repository
+- [ ] Create `IAmsSlotRepository` interface inside `Repositories/`
+- [ ] Create `AmsSlotRepository` class implementing `IAmsSlotRepository`
+- [ ] Add `GetAllAsync` — return all slots including their assigned spool
+- [ ] Add `GetBySlotAsync` — return slot by unit and slot index
+- [ ] Add `UpsertAsync` — create or update a slot assignment by unit and index
+- [ ] Register `IAmsSlotRepository` → `AmsSlotRepository` in `Program.cs`
+
+### AMS API
+- [ ] Create `AmsController` inside `Controllers/`
+- [ ] Add `GET /api/ams` — return all slots with assigned spool data
+- [ ] Add `PUT /api/ams/{unit}/{slot}` — assign or unassign a spool to a slot
+- [ ] Return `404` if spool ID does not exist when assigning
+- [ ] Allow `SpoolId` to be null to unassign a slot
+
+### Update MQTT service
+- [ ] Update `MqttListenerService` to parse AMS slot data from print-finish payload
+- [ ] Extract which slot was used from `print.ams` in the payload
+- [ ] Look up the assigned spool for that slot via `IAmsSlotRepository`
+- [ ] Log warning and skip if the slot has no spool assigned
+- [ ] Deduct grams from the slot's assigned spool instead of the globally active spool
+- [ ] Keep the single active spool fallback for non-AMS prints
+
+### Duplicate slot assignment guard
+- [ ] Check if a spool is already assigned to another slot before assigning
+- [ ] Return `409 Conflict` if the same spool is assigned to two different slots
+- [ ] Show a clear error in the UI if the user tries to assign a duplicate
+
+### Web UI updates
+- [ ] Add AMS panel to the dashboard
+- [ ] Show 4 slot cards representing AMS unit 0
+- [ ] Each card shows assigned spool color, material, and remaining grams
+- [ ] Show `Empty` state in grey for unassigned slots
+- [ ] Allow user to assign a spool to a slot by selecting from the spool list
+- [ ] Allow user to unassign a slot
+- [ ] Prevent assigning the same spool to two slots — show error message
 
 ---
 
-## What to Create
-
-### `AmsSlot.cs` — new entity
-
-```csharp
-// src/Spoolarr.Api/Models/AmsSlot.cs
-public class AmsSlot
-{
-    public Guid Id { get; set; } = Guid.NewGuid();
-    public int SlotIndex { get; set; }   // 0, 1, 2, 3
-    public int AmsUnit { get; set; } = 0; // for multi-AMS setups
-    public Guid? SpoolId { get; set; }
-    public Spool? Spool { get; set; }
-    public DateTime? LoadedAt { get; set; }
-}
-```
-
-### Add to `FilamentDbContext.cs`
-
-```csharp
-public DbSet<AmsSlot> AmsSlots => Set<AmsSlot>();
-```
-
-### EF Core migration
-
-```bash
-dotnet ef migrations add AddAmsSlots
-dotnet ef database update
-```
-
-### `AmsSlotRepository.cs`
-
-```csharp
-// src/Spoolarr.Api/Repositories/AmsSlotRepository.cs
-public interface IAmsSlotRepository
-{
-    Task<List<AmsSlot>> GetAllAsync();
-    Task<AmsSlot?> GetBySlotAsync(int unit, int slot);
-    Task<AmsSlot> UpsertAsync(int unit, int slot, Guid? spoolId);
-}
-
-public class AmsSlotRepository : IAmsSlotRepository
-{
-    private readonly FilamentDbContext _db;
-    public AmsSlotRepository(FilamentDbContext db) => _db = db;
-
-    public Task<List<AmsSlot>> GetAllAsync() =>
-        _db.AmsSlots.Include(s => s.Spool).ToListAsync();
-
-    public Task<AmsSlot?> GetBySlotAsync(int unit, int slot) =>
-        _db.AmsSlots
-            .Include(s => s.Spool)
-            .FirstOrDefaultAsync(s => s.AmsUnit == unit && s.SlotIndex == slot);
-
-    public async Task<AmsSlot> UpsertAsync(int unit, int slot, Guid? spoolId)
-    {
-        var existing = await GetBySlotAsync(unit, slot);
-        if (existing is null)
-        {
-            existing = new AmsSlot { AmsUnit = unit, SlotIndex = slot };
-            _db.AmsSlots.Add(existing);
-        }
-        existing.SpoolId = spoolId;
-        existing.LoadedAt = spoolId.HasValue ? DateTime.UtcNow : null;
-        await _db.SaveChangesAsync();
-        return existing;
-    }
-}
-```
-
-### `AmsController.cs` — manage slot assignments
-
-```csharp
-// src/Spoolarr.Api/Controllers/AmsController.cs
-[ApiController]
-[Route("api/ams")]
-public class AmsController : ControllerBase
-{
-    private readonly IAmsSlotRepository _repo;
-    public AmsController(IAmsSlotRepository repo) => _repo = repo;
-
-    [HttpGet]
-    public async Task<IActionResult> GetSlots()
-    {
-        var slots = await _repo.GetAllAsync();
-        return Ok(slots);
-    }
-
-    [HttpPut("{unit}/{slot}")]
-    public async Task<IActionResult> AssignSpool(int unit, int slot, [FromBody] AssignSlotRequest request)
-    {
-        var result = await _repo.UpsertAsync(unit, slot, request.SpoolId);
-        return Ok(result);
-    }
-}
-
-public record AssignSlotRequest(Guid? SpoolId);
-```
-
-### Update `MqttListenerService.cs` — parse AMS slot from print event
-
-```csharp
-// Replace the single active-spool logic with slot-aware logic
-private async Task DeductFromSlotAsync(int amsUnit, int slotIndex, float gramsUsed, string? printName)
-{
-    using var scope = _scopeFactory.CreateScope();
-    var slotRepo = scope.ServiceProvider.GetRequiredService<IAmsSlotRepository>();
-    var spoolRepo = scope.ServiceProvider.GetRequiredService<ISpoolRepository>();
-    var printJobRepo = scope.ServiceProvider.GetRequiredService<IPrintJobRepository>();
-
-    var slot = await slotRepo.GetBySlotAsync(amsUnit, slotIndex);
-    if (slot?.SpoolId is null)
-    {
-        _logger.LogWarning("AMS unit {Unit} slot {Slot} has no spool assigned. Skipping.", amsUnit, slotIndex);
-        return;
-    }
-
-    var spool = await spoolRepo.GetByIdAsync(slot.SpoolId.Value);
-    if (spool is null) return;
-
-    spool.CurrentWeightG = Math.Max(0, spool.CurrentWeightG - gramsUsed);
-    await spoolRepo.UpdateAsync(spool);
-
-    await printJobRepo.CreateAsync(new PrintJob
-    {
-        SpoolId = spool.Id,
-        GramsUsed = gramsUsed,
-        PrintName = printName,
-        Source = "mqtt"
-    });
-
-    _logger.LogInformation(
-        "AMS unit {Unit} slot {Slot}: deducted {Grams}g. Remaining: {Remaining}g",
-        amsUnit, slotIndex, gramsUsed, spool.CurrentWeightG);
-}
-```
-
-### Bambu AMS MQTT payload reference
-
-When using AMS, the print event includes slot information:
-
-```json
-{
-  "print": {
-    "gcode_state": "FINISH",
-    "ams": {
-      "ams": [
-        {
-          "id": "0",
-          "tray": [
-            { "id": "0", "remain": 87 },
-            { "id": "1", "remain": 45 },
-            { "id": "2", "remain": 100 },
-            { "id": "3", "remain": 12 }
-          ]
-        }
-      ]
-    },
-    "ams_rfid_status": 3,
-    "filament_weight": 8.4
-  }
-}
-```
-
-Key fields:
+## AMS MQTT Payload Reference
 
 | Field | Description |
 |---|---|
-| `ams[n].tray[n].id` | Slot index (0–3) |
-| `ams[n].tray[n].remain` | Remaining % (Bambu's own estimate) |
-| `filament_weight` | Grams used in this print |
+| `print.ams.ams[n].id` | AMS unit index |
+| `print.ams.ams[n].tray[n].id` | Slot index 0–3 |
+| `print.filament_weight` | Total grams used in the print |
 
-> Note: Bambu reports `remain` as a percentage, not grams. Spoolarr ignores this and uses its own gram tracking from `filament_weight` deductions for accuracy.
+> Spoolarr ignores Bambu's own `remain` percentage and uses its own gram tracking for accuracy.
 
 ---
 
-## New API endpoints
+## API Reference
 
-| Method | Endpoint | Description |
+| Method | Endpoint | Returns |
 |---|---|---|
-| `GET` | `/api/ams` | List all AMS slots and assigned spools |
-| `PUT` | `/api/ams/{unit}/{slot}` | Assign a spool to a slot |
-
----
-
-## UI changes (Milestone 5 extension)
-
-- Add an **AMS panel** to the dashboard showing 4 slot cards
-- Each slot shows the assigned spool color, material, and remaining grams
-- Drag or select to assign a spool to a slot
-- Unassigned slots show "Empty" in grey
-
----
-
-## How to Test
-
-```bash
-# Assign spool to AMS unit 0, slot 1
-curl -X PUT http://localhost:5000/api/ams/0/1 \
-  -H "Content-Type: application/json" \
-  -d '{ "spoolId": "your-spool-guid-here" }'
-
-# Get all slot assignments
-curl http://localhost:5000/api/ams
-```
-
-Then finish a multi-colour AMS print and verify the correct spool's weight was deducted.
+| `GET` | `/api/ams` | `200` list of all slots |
+| `PUT` | `/api/ams/{unit}/{slot}` | `200` updated slot or `404` |
 
 ---
 
 ## Definition of Done
 
 - [ ] `AmsSlots` table created by migration
-- [ ] Spools can be assigned to slots via `PUT /api/ams/{unit}/{slot}`
+- [ ] Spools can be assigned and unassigned from slots via the API
 - [ ] Print-finish event deducts from the correct slot's spool
-- [ ] Warning logged when slot has no spool assigned
-- [ ] Dashboard shows AMS slot panel with live spool data
+- [ ] Warning is logged when a slot has no spool assigned
+- [ ] Non-AMS prints still fall back to the active spool
+- [ ] AMS panel shows in the dashboard with live slot data
+- [ ] All new endpoints tested with Postman or curl
+- [ ] Assigning the same spool to two slots returns `409 Conflict`
+- [ ] Non-AMS prints still fall back to the active spool correctly
