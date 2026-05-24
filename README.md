@@ -127,10 +127,10 @@ Then open `https://spoolarr.local` (or your Docker host IP) in your browser.
 
 ## Roadmap
 
-- [x] Phase 1 — NFC spool identity
-- [x] Phase 2 — Bambu Lab MQTT integration (no AMS)
-- [x] Phase 3 — Gram tracking per spool
-- [x] Phase 4 — Docker stack
+- [ ] Phase 1 — NFC spool identity
+- [ ] Phase 2 — Bambu Lab MQTT integration (no AMS)
+- [ ] Phase 3 — Gram tracking per spool
+- [ ] Phase 4 — Docker stack
 - [ ] Phase 5 — AMS multi-slot support
 - [ ] Phase 6 — Low stock alerts (ntfy / webhook)
 - [ ] Phase 7 — Print history & stats dashboard
