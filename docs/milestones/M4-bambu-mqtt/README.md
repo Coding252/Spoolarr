@@ -21,20 +21,20 @@ By the end of this milestone finishing a print on your Bambu printer automatical
 ## Tasks
 
 ### NuGet packages
-- [ ] Install `MQTTnet`
-- [ ] Install `MQTTnet.Extensions.ManagedClient`
+- [ ] Install `MQTTnet` in `Infrastructure`
+- [ ] Install `MQTTnet.Extensions.ManagedClient` in `Infrastructure`
 
 ### Settings
-- [ ] Create `BambuMqttSettings` class inside `Settings/`
+- [ ] Create `BambuMqttSettings` class inside `Infrastructure/Settings/`
 - [ ] Add `PrinterIp` field — string
 - [ ] Add `Port` field — int, default `8883`
 - [ ] Add `Serial` field — string
 - [ ] Add `AccessCode` field — string
-- [ ] Add `BambuMqtt` section to `appsettings.json` with placeholder values
+- [ ] Add `BambuMqtt` section to `appsettings.json` in `API` with placeholder values
 - [ ] Register `BambuMqttSettings` in `Program.cs` via `Configure<BambuMqttSettings>`
 
 ### MqttListenerService
-- [ ] Create `MqttListenerService` class inside `Services/`
+- [ ] Create `MqttListenerService` class inside `Infrastructure/Services/`
 - [ ] Implement `IHostedService` interface
 - [ ] Add `StartAsync` — create MQTT client and connect to printer using settings
 - [ ] Configure TLS with certificate validation disabled for LAN use

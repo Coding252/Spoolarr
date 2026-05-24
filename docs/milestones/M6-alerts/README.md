@@ -22,17 +22,17 @@ By the end of this milestone whenever a print finishes and a spool drops below i
 - [ ] Confirm `HttpClient` is available via `IHttpClientFactory` — register if not already done
 
 ### Settings
-- [ ] Create `AlertSettings` class inside `Settings/`
+- [ ] Create `AlertSettings` class inside `Infrastructure/Settings/`
 - [ ] Add `Enabled` field — bool, default `true`
 - [ ] Add `Provider` field — string, values: `"ntfy"` or `"webhook"`
 - [ ] Add `NtfyUrl` field — string
 - [ ] Add `WebhookUrl` field — string
-- [ ] Add `Alerts` section to `appsettings.json` with placeholder values
+- [ ] Add `Alerts` section to `appsettings.json` in `API` with placeholder values
 - [ ] Register `AlertSettings` in `Program.cs` via `Configure<AlertSettings>`
 
 ### AlertService
-- [ ] Create `IAlertService` interface inside `Services/`
-- [ ] Create `AlertService` class implementing `IAlertService`
+- [ ] Create `IAlertService` interface inside `Application/Interfaces/`
+- [ ] Create `AlertService` class inside `Application/Services/` implementing `IAlertService`
 - [ ] Add `CheckAndAlertAsync` — takes a `Spool`, checks threshold, sends alert if needed
 - [ ] Skip if `Enabled` is false in settings
 - [ ] Skip if `CurrentWeightG` is above `LowStockThresholdG`

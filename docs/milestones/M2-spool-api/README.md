@@ -20,14 +20,13 @@ By the end of this milestone you have a fully working REST API for spool managem
 ## Tasks
 
 ### DTOs
-- [ ] Create `DTOs/` folder inside `Spoolarr.Api`
-- [ ] Create `SpoolResponse` record — all spool fields returned to the client
-- [ ] Create `RegisterSpoolRequest` record — fields required to register a new spool
-- [ ] Create `UpdateWeightRequest` record — single `NewWeightG` field
+- [ ] Create `SpoolResponse` record inside `Application/DTOs/` — all spool fields returned to the client
+- [ ] Create `RegisterSpoolRequest` record inside `Application/DTOs/` — fields required to register a new spool
+- [ ] Create `UpdateWeightRequest` record inside `Application/DTOs/` — single `NewWeightG` field
 
 ### SpoolService
-- [ ] Create `ISpoolService` interface inside `Services/`
-- [ ] Create `SpoolService` class implementing `ISpoolService`
+- [ ] Create `ISpoolService` interface inside `Application/Interfaces/`
+- [ ] Create `SpoolService` class inside `Application/Services/` implementing `ISpoolService`
 - [ ] Add `GetAllAsync` — return all spools as `SpoolResponse` list
 - [ ] Add `GetByIdAsync` — return single spool as `SpoolResponse` or null
 - [ ] Add `RegisterAsync` — create new spool from `RegisterSpoolRequest`
@@ -37,7 +36,7 @@ By the end of this milestone you have a fully working REST API for spool managem
 - [ ] Register `ISpoolService` → `SpoolService` in `Program.cs`
 
 ### SpoolController
-- [ ] Create `SpoolController` inside `Controllers/`
+- [ ] Create `SpoolController` inside `API/Controllers/`
 - [ ] Add `GET /api/spools` — returns list of all spools
 - [ ] Add `GET /api/spools/{id}` — returns single spool or `404`
 - [ ] Add `POST /api/spools` — registers new spool, returns `201 Created` with location header
@@ -90,4 +89,3 @@ By the end of this milestone you have a fully working REST API for spool managem
 - [ ] Duplicate `NfcTagUid` returns `409 Conflict`
 - [ ] All endpoints tested manually with Postman, curl, or Swagger UI
 - [ ] CORS does not block frontend requests in development
-- [ ] Duplicate `NfcTagUid` correctly returns `409 Conflict`

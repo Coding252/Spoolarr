@@ -20,30 +20,44 @@ Nothing. This is the first milestone.
 
 ### Solution setup
 - [ ] Create the solution file `Spoolarr.sln`
-- [ ] Create the `Spoolarr.Api` ASP.NET Core Web API project
-- [ ] Add `Spoolarr.Api` to the solution
+- [ ] Create the `API` ASP.NET Core Web API project inside `src/`
+- [ ] Create the `Application` class library project inside `src/`
+- [ ] Create the `Domain` class library project inside `src/`
+- [ ] Create the `Infrastructure` class library project inside `src/`
+- [ ] Create the `Test` project inside `src/`
+- [ ] Add all 5 projects to `Spoolarr.sln`
+
+### Project references
+- [ ] Add `Domain` reference to `Application`
+- [ ] Add `Application` reference to `API`
+- [ ] Add `Application` reference to `Infrastructure`
+- [ ] Add `Domain` reference to `Infrastructure`
+- [ ] Add `API` and `Infrastructure` reference to `Test`
 
 ### NuGet packages
-- [ ] Install `Microsoft.EntityFrameworkCore`
-- [ ] Install `Microsoft.EntityFrameworkCore.Sqlite`
-- [ ] Install `Microsoft.EntityFrameworkCore.Design`
+- [ ] Install `Microsoft.EntityFrameworkCore` in `Infrastructure`
+- [ ] Install `Microsoft.EntityFrameworkCore.Sqlite` in `Infrastructure`
+- [ ] Install `Microsoft.EntityFrameworkCore.Design` in `Infrastructure`
 
 ### Project structure
-- [ ] Create `Controllers/` folder
-- [ ] Create `Data/` folder
-- [ ] Create `Models/` folder
-- [ ] Create `Services/` folder
-- [ ] Create `Repositories/` folder
-- [ ] Create `Settings/` folder
-- [ ] Create `Hubs/` folder
+- [ ] Create `Controllers/` folder in `API`
+- [ ] Create `Hubs/` folder in `API`
+- [ ] Create `DTOs/` folder in `Application`
+- [ ] Create `Interfaces/` folder in `Application`
+- [ ] Create `Services/` folder in `Application`
+- [ ] Create `Models/` folder in `Domain`
+- [ ] Create `Data/` folder in `Infrastructure`
+- [ ] Create `Repositories/` folder in `Infrastructure`
+- [ ] Create `Services/` folder in `Infrastructure`
+- [ ] Create `Settings/` folder in `Infrastructure`
 
 ### Database
-- [ ] Create `FilamentDbContext` class inside `Data/`
-- [ ] Add SQLite connection string to `appsettings.json`
+- [ ] Create `FilamentDbContext` class inside `Infrastructure/Data/`
+- [ ] Add SQLite connection string to `appsettings.json` in `API`
 - [ ] Register `FilamentDbContext` in `Program.cs`
 
 ### Health check
-- [ ] Create `HealthController` inside `Controllers/`
+- [ ] Create `HealthController` inside `API/Controllers/`
 - [ ] Add `GET /health` endpoint that returns `{ status: "ok", app: "Spoolarr" }`
 
 ### Docker

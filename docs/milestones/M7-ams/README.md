@@ -21,7 +21,7 @@ By the end of this milestone each AMS slot is mapped to a registered spool. When
 ## Tasks
 
 ### Models
-- [ ] Create `AmsSlot` entity class inside `Models/`
+- [ ] Create `AmsSlot` entity class inside `Domain/Models/`
 - [ ] Add `Id` field — Guid, primary key
 - [ ] Add `SlotIndex` field — int, values 0–3
 - [ ] Add `AmsUnit` field — int, default 0 (for multi-AMS setups)
@@ -33,20 +33,20 @@ By the end of this milestone each AMS slot is mapped to a registered spool. When
 - [ ] Add `DbSet<AmsSlot>` to `FilamentDbContext`
 - [ ] Configure foreign key from `AmsSlot.SpoolId` to `Spool.Id`
 - [ ] Set foreign key as nullable — slot can be empty
-- [ ] Run `dotnet ef migrations add AddAmsSlots`
-- [ ] Run `dotnet ef database update`
+- [ ] Run `dotnet ef migrations add AddAmsSlots` — run from the `Infrastructure` project
+- [ ] Run `dotnet ef database update` — run from the `Infrastructure` project
 - [ ] Confirm `AmsSlots` table is created
 
 ### Repository
-- [ ] Create `IAmsSlotRepository` interface inside `Repositories/`
-- [ ] Create `AmsSlotRepository` class implementing `IAmsSlotRepository`
+- [ ] Create `IAmsSlotRepository` interface inside `Infrastructure/Repositories/`
+- [ ] Create `AmsSlotRepository` class inside `Infrastructure/Repositories/` implementing `IAmsSlotRepository`
 - [ ] Add `GetAllAsync` — return all slots including their assigned spool
 - [ ] Add `GetBySlotAsync` — return slot by unit and slot index
 - [ ] Add `UpsertAsync` — create or update a slot assignment by unit and index
 - [ ] Register `IAmsSlotRepository` → `AmsSlotRepository` in `Program.cs`
 
 ### AMS API
-- [ ] Create `AmsController` inside `Controllers/`
+- [ ] Create `AmsController` inside `API/Controllers/`
 - [ ] Add `GET /api/ams` — return all slots with assigned spool data
 - [ ] Add `PUT /api/ams/{unit}/{slot}` — assign or unassign a spool to a slot
 - [ ] Return `404` if spool ID does not exist when assigning
@@ -103,8 +103,7 @@ By the end of this milestone each AMS slot is mapped to a registered spool. When
 - [ ] Spools can be assigned and unassigned from slots via the API
 - [ ] Print-finish event deducts from the correct slot's spool
 - [ ] Warning is logged when a slot has no spool assigned
-- [ ] Non-AMS prints still fall back to the active spool
+- [ ] Non-AMS prints still fall back to the active spool correctly
 - [ ] AMS panel shows in the dashboard with live slot data
 - [ ] All new endpoints tested with Postman or curl
 - [ ] Assigning the same spool to two slots returns `409 Conflict`
-- [ ] Non-AMS prints still fall back to the active spool correctly
