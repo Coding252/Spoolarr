@@ -21,32 +21,32 @@ By the end of this milestone tapping a phone to a spool triggers a scan event th
 ## Tasks
 
 ### NuGet packages
-- [ ] Install `Microsoft.AspNetCore.SignalR`
+- [ ] Install `Microsoft.AspNetCore.SignalR` in `API`
 
 ### Models
-- [ ] Create `NfcScanResult` record inside `Models/`
+- [ ] Create `NfcScanResult` record inside `Domain/Models/`
 - [ ] Add `Status` field — string, values: `"activated"` or `"unknown"`
 - [ ] Add `TagUid` field — string
 - [ ] Add `Spool` field — `SpoolResponse`, nullable
 - [ ] Add `Message` field — string, nullable
-- [ ] Create `ScanRequest` record inside `Models/`
+- [ ] Create `ScanRequest` record inside `Domain/Models/`
 - [ ] Add `TagUid` field — string
 
 ### NfcScanService
-- [ ] Create `INfcScanService` interface inside `Services/`
-- [ ] Create `NfcScanService` class implementing `INfcScanService`
+- [ ] Create `INfcScanService` interface inside `Application/Interfaces/`
+- [ ] Create `NfcScanService` class inside `Application/Services/` implementing `INfcScanService`
 - [ ] Add `ProcessScanAsync` — takes tag UID, returns `NfcScanResult`
 - [ ] If tag UID not found in DB → return status `"unknown"` with no spool
 - [ ] If tag UID found in DB → activate spool, return status `"activated"` with spool data
 - [ ] Register `INfcScanService` → `NfcScanService` in `Program.cs`
 
 ### SignalR hub
-- [ ] Create `NfcScanHub` class inside `Hubs/`
+- [ ] Create `NfcScanHub` class inside `API/Hubs/`
 - [ ] Register SignalR in `Program.cs` via `builder.Services.AddSignalR()`
 - [ ] Map hub endpoint to `/hubs/nfc` in `Program.cs`
 
 ### ScanController
-- [ ] Create `ScanController` inside `Controllers/`
+- [ ] Create `ScanController` inside `API/Controllers/`
 - [ ] Add `POST /api/spools/scan` endpoint
 - [ ] Validate `TagUid` is not empty — return `400` if missing
 - [ ] Call `NfcScanService.ProcessScanAsync` with the tag UID

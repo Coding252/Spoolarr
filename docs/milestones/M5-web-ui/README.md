@@ -21,8 +21,8 @@ By the end of this milestone you have a fully working mobile-friendly web UI acc
 
 ### Project setup
 - [ ] Decide on frontend approach — React or plain HTML/JS
-- [ ] Create `Spoolarr.Web` project inside `src/`
-- [ ] Add `Spoolarr.Web` to `Spoolarr.sln`
+- [ ] Create `Web` project inside `src/`
+- [ ] Add `Web` to `Spoolarr.sln`
 - [ ] Install SignalR JavaScript client library
 - [ ] Create `Dockerfile.web` inside `docker/`
 - [ ] Add `web` service to `docker-compose.yml`

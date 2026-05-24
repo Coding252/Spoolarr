@@ -19,8 +19,8 @@ By the end of this milestone the database has the correct tables for spools and 
 ## Tasks
 
 ### Models
-- [ ] Create `Spool` entity class inside `Models/`
-- [ ] Create `PrintJob` entity class inside `Models/`
+- [ ] Create `Spool` entity class inside `Domain/Models/`
+- [ ] Create `PrintJob` entity class inside `Domain/Models/`
 
 ### Spool fields
 - [ ] `Id` — Guid, primary key
@@ -55,12 +55,12 @@ By the end of this milestone the database has the correct tables for spools and 
 - [ ] Configure foreign key relationship between `PrintJob` and `Spool`
 
 ### Migrations
-- [ ] Run `dotnet ef migrations add InitialCreate`
-- [ ] Run `dotnet ef database update`
+- [ ] Run `dotnet ef migrations add InitialCreate` — run from the `Infrastructure` project
+- [ ] Run `dotnet ef database update` — run from the `Infrastructure` project
 - [ ] Confirm `Spools` and `PrintJobs` tables are created in the SQLite file
 
 ### Repositories
-- [ ] Create `ISpoolRepository` interface inside `Repositories/`
+- [ ] Create `ISpoolRepository` interface inside `Infrastructure/Repositories/`
 - [ ] Create `SpoolRepository` class implementing `ISpoolRepository`
 - [ ] Add `GetAllAsync` — return all spools ordered by last scanned
 - [ ] Add `GetByIdAsync` — return spool by ID including print jobs
@@ -69,7 +69,7 @@ By the end of this milestone the database has the correct tables for spools and 
 - [ ] Add `CreateAsync` — insert new spool
 - [ ] Add `UpdateAsync` — update existing spool
 - [ ] Add `DeleteAsync` — delete spool by ID
-- [ ] Create `IPrintJobRepository` interface inside `Repositories/`
+- [ ] Create `IPrintJobRepository` interface inside `Infrastructure/Repositories/`
 - [ ] Create `PrintJobRepository` class implementing `IPrintJobRepository`
 - [ ] Add `GetBySpoolIdAsync` — return all print jobs for a spool ordered by date
 - [ ] Add `CreateAsync` — insert new print job
@@ -79,7 +79,7 @@ By the end of this milestone the database has the correct tables for spools and 
 - [ ] Register `IPrintJobRepository` → `PrintJobRepository` in `Program.cs`
 
 ### Seed data
-- [ ] Create `SeedData` class inside `Data/`
+- [ ] Create `SeedData` class inside `Infrastructure/Data/`
 - [ ] Add at least 2 test spools with different materials and colors
 - [ ] Call `SeedData` on app startup only if the database is empty
 - [ ] Run migrations automatically on app startup

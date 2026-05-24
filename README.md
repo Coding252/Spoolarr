@@ -25,16 +25,16 @@ No subscriptions. No cloud. No vendor lock-in. Runs entirely on your local netwo
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Backend API | C# · ASP.NET Core · .NET 8 |
-| Real-time | SignalR (NFC scan push to browser) |
-| MQTT listener | MQTTnet · `IHostedService` |
-| Database | SQLite (default) |
-| ORM | Entity Framework Core |
-| Frontend | React or plain HTML/JS |
-| Reverse proxy | Caddy (HTTPS for Web NFC API) |
-| Container | Docker · docker-compose |
+| Layer | Project | Technology |
+|---|---|---|
+| Entry point | `API` | C# · ASP.NET Core · .NET 8 |
+| Business logic | `Application` | C# · interfaces · DTOs |
+| Domain models | `Domain` | Pure C# — no dependencies |
+| Data & external | `Infrastructure` | EF Core · MQTTnet · SQLite |
+| Real-time | `API` | SignalR |
+| Frontend | — | React or plain HTML/JS |
+| Reverse proxy | — | Caddy (HTTPS for Web NFC) |
+| Container | — | Docker · docker-compose |
 
 ---
 
@@ -48,39 +48,105 @@ No subscriptions. No cloud. No vendor lock-in. Runs entirely on your local netwo
 
 ---
 
+## Scan Flow
+
+![Spoolarr NFC Scan Flow](docs/spoolarr-nfc-scan-flow.png)
+
+> Full interactive version — open [`docs/spoolarr-nfc-scan-flow.html`](docs/spoolarr-nfc-scan-flow.html) in any browser.
+
+---
+
 ## Project Structure
 
+Spoolarr follows a **Clean Architecture** pattern split across 5 projects.
+
 ```
-spoolarr/
+Spoolarr/
 ├── src/
-│   ├── Spoolarr.Api/              # ASP.NET Core Web API
+│   ├── API/                          # Entry point — controllers, hubs, Program.cs
 │   │   ├── Controllers/
+│   │   │   ├── HealthController.cs
 │   │   │   ├── SpoolController.cs
-│   │   │   └── PrintJobController.cs
+│   │   │   ├── ScanController.cs
+│   │   │   └── AmsController.cs
 │   │   ├── Hubs/
-│   │   │   └── NfcScanHub.cs       # SignalR hub
-│   │   ├── Services/
-│   │   │   ├── SpoolService.cs
-│   │   │   ├── NfcScanService.cs
-│   │   │   └── MqttListenerService.cs
-│   │   ├── Repositories/
-│   │   │   ├── SpoolRepository.cs
-│   │   │   └── PrintJobRepository.cs
-│   │   ├── Models/
-│   │   │   ├── Spool.cs
-│   │   │   └── PrintJob.cs
-│   │   ├── Data/
-│   │   │   └── FilamentDbContext.cs
+│   │   │   └── NfcScanHub.cs
+│   │   ├── appsettings.json
+│   │   ├── appsettings.Development.json
 │   │   └── Program.cs
-│   └── Spoolarr.Web/              # Frontend UI
+│   │
+│   ├── Application/                  # Business logic — services, interfaces, DTOs
+│   │   ├── DTOs/
+│   │   │   └── SpoolDto.cs
+│   │   ├── Interfaces/
+│   │   │   ├── ISpoolService.cs
+│   │   │   └── INfcScanService.cs
+│   │   └── Services/
+│   │       ├── SpoolService.cs
+│   │       ├── NfcScanService.cs
+│   │       └── AlertService.cs
+│   │
+│   ├── Domain/                       # Pure C# models — no dependencies
+│   │   └── Models/
+│   │       ├── Spool.cs
+│   │       ├── PrintJob.cs
+│   │       ├── AmsSlot.cs
+│   │       └── NfcScanResult.cs
+│   │
+│   ├── Infrastructure/               # EF Core, repositories, MQTT, settings
+│   │   ├── Data/
+│   │   │   ├── FilamentDbContext.cs
+│   │   │   └── SeedData.cs
+│   │   ├── Repositories/
+│   │   │   ├── ISpoolRepository.cs
+│   │   │   ├── SpoolRepository.cs
+│   │   │   ├── IPrintJobRepository.cs
+│   │   │   ├── PrintJobRepository.cs
+│   │   │   ├── IAmsSlotRepository.cs
+│   │   │   └── AmsSlotRepository.cs
+│   │   ├── Services/
+│   │   │   └── MqttListenerService.cs
+│   │   └── Settings/
+│   │       ├── BambuMqttSettings.cs
+│   │       └── AlertSettings.cs
+│   │
+│   └── Test/                         # Unit tests
+│       └── Services/
+│
 ├── docker/
 │   ├── docker-compose.yml
 │   ├── Dockerfile.api
 │   └── Caddyfile
 ├── docs/
-│   └── spoolarr-nfc-scan-flow.html
+│   ├── ROADMAP.md
+│   ├── spoolarr-nfc-scan-flow.html
+│   └── milestones/
+│       ├── M0-bootstrap/
+│       ├── M1-data-model/
+│       ├── M2-spool-api/
+│       ├── M3-nfc-scan/
+│       ├── M4-bambu-mqtt/
+│       ├── M5-web-ui/
+│       ├── M6-alerts/
+│       └── M7-ams/
+├── .gitignore
 └── README.md
 ```
+
+### Dependency direction
+
+```
+API → Application → Domain
+Infrastructure → Application → Domain
+```
+
+| Project | Responsibility |
+|---|---|
+| `API` | HTTP entry point — controllers, SignalR hubs, middleware, `Program.cs` |
+| `Application` | Business logic — services, interfaces, DTOs |
+| `Domain` | Pure C# models and entities — no dependencies on anything |
+| `Infrastructure` | EF Core, repositories, MQTT listener, settings |
+| `Test` | Unit tests for the Application layer |
 
 ---
 
@@ -119,7 +185,7 @@ Then open `https://spoolarr.local` (or your Docker host IP) in your browser.
 
 ## Roadmap
 
-Each milestone has its own detailed README with tasks, code snippets, and definition of done.
+Each milestone has its own detailed README with tasks and definition of done.
 
 | Milestone | Description | Status |
 |---|---|---|
@@ -137,80 +203,246 @@ Each milestone has its own detailed README with tasks, code snippets, and defini
 <details>
 <summary>Milestone 0 — Project Bootstrap</summary>
 
-- [ ] Create solution `Spoolarr.sln` with `Spoolarr.Api` and `Spoolarr.Web` projects
-- [ ] Set up Docker + docker-compose skeleton
-- [ ] Configure Caddy for HTTPS
-- [ ] Set up EF Core + SQLite + `FilamentDbContext`
-- [ ] Basic health check endpoint `GET /health`
+#### Solution setup
+- [ ] Create the solution file `Spoolarr.sln`
+- [ ] Create the `API` ASP.NET Core Web API project inside `src/`
+- [ ] Create the `Application` class library project inside `src/`
+- [ ] Create the `Domain` class library project inside `src/`
+- [ ] Create the `Infrastructure` class library project inside `src/`
+- [ ] Create the `Test` project inside `src/`
+- [ ] Add all 5 projects to `Spoolarr.sln`
+
+#### NuGet packages
+- [ ] Install `Microsoft.EntityFrameworkCore` in `Infrastructure`
+- [ ] Install `Microsoft.EntityFrameworkCore.Sqlite` in `Infrastructure`
+- [ ] Install `Microsoft.EntityFrameworkCore.Design` in `Infrastructure`
+
+#### Project structure
+- [ ] Create `Controllers/` folder in `API`
+- [ ] Create `Hubs/` folder in `API`
+- [ ] Create `DTOs/` folder in `Application`
+- [ ] Create `Interfaces/` folder in `Application`
+- [ ] Create `Services/` folder in `Application`
+- [ ] Create `Models/` folder in `Domain`
+- [ ] Create `Data/` folder in `Infrastructure`
+- [ ] Create `Repositories/` folder in `Infrastructure`
+- [ ] Create `Services/` folder in `Infrastructure`
+- [ ] Create `Settings/` folder in `Infrastructure`
+
+#### Database
+- [ ] Create `FilamentDbContext` class inside `Infrastructure/Data/`
+- [ ] Add SQLite connection string to `appsettings.json`
+- [ ] Register `FilamentDbContext` in `Program.cs`
+
+#### Health check
+- [ ] Create `HealthController` inside `API/Controllers/`
+- [ ] Add `GET /health` endpoint that returns `{ status: "ok", app: "Spoolarr" }`
+
+#### Docker
+- [ ] Create `docker/` folder at the root of the project
+- [ ] Write `Dockerfile.api` for the API project
+- [ ] Write `docker-compose.yml` with the API service and a persistent volume for SQLite
+- [ ] Write `Caddyfile` for HTTPS reverse proxy
+- [ ] Add Caddy service to `docker-compose.yml`
+
+#### Environment config
+- [ ] Create `appsettings.Development.json` for local dev
+- [ ] Add `ASPNETCORE_ENVIRONMENT` to docker-compose
+- [ ] Make sure SQLite file is stored in the persistent volume `/data/spoolarr.db`
+
+#### Git
+- [ ] Create `.gitignore` at the root of the project
 
 </details>
 
 <details>
 <summary>Milestone 1 — Data Model</summary>
 
-- [ ] `Spool` entity + migration
-- [ ] `PrintJob` entity + migration
-- [ ] `SpoolRepository` + `PrintJobRepository`
-- [ ] Seed data for testing
+#### Models
+- [ ] Create `Spool` entity class inside `Domain/Models/`
+- [ ] Create `PrintJob` entity class inside `Domain/Models/`
+
+#### Spool fields
+- [ ] `Id` — Guid, primary key
+- [ ] `NfcTagUid` — string, unique
+- [ ] `Brand` — string
+- [ ] `Material` — string
+- [ ] `ColorName` — string
+- [ ] `ColorHex` — string
+- [ ] `InitialWeightG` — float
+- [ ] `CurrentWeightG` — float
+- [ ] `LowStockThresholdG` — float, default 100g
+- [ ] `IsActive` — bool, default false
+- [ ] `CreatedAt` — DateTime
+- [ ] `LastScannedAt` — DateTime, nullable
+- [ ] `Notes` — string, nullable
+- [ ] `PrintJobs` — navigation property to `PrintJob`
+
+#### PrintJob fields
+- [ ] `Id` — Guid, primary key
+- [ ] `SpoolId` — Guid, foreign key to `Spool`
+- [ ] `GramsUsed` — float
+- [ ] `PrintName` — string, nullable
+- [ ] `PrintedAt` — DateTime
+- [ ] `Source` — string, default `"mqtt"`
+- [ ] `Spool` — navigation property to `Spool`
+
+#### Database context
+- [ ] Add `DbSet<Spool>` to `FilamentDbContext`
+- [ ] Add `DbSet<PrintJob>` to `FilamentDbContext`
+- [ ] Configure unique index on `Spool.NfcTagUid`
+- [ ] Configure cascade delete
+- [ ] Configure foreign key relationship between `PrintJob` and `Spool`
+
+#### Migrations
+- [ ] Run `dotnet ef migrations add InitialCreate`
+- [ ] Run `dotnet ef database update`
+- [ ] Confirm `Spools` and `PrintJobs` tables are created
+
+#### Repositories
+- [ ] Create `ISpoolRepository` interface in `Infrastructure/Repositories/`
+- [ ] Create `SpoolRepository` implementing `ISpoolRepository`
+- [ ] Add `GetAllAsync`, `GetByIdAsync`, `GetByNfcTagUidAsync`, `GetActiveAsync`
+- [ ] Add `CreateAsync`, `UpdateAsync`, `DeleteAsync`
+- [ ] Create `IPrintJobRepository` interface in `Infrastructure/Repositories/`
+- [ ] Create `PrintJobRepository` implementing `IPrintJobRepository`
+- [ ] Add `GetBySpoolIdAsync`, `CreateAsync`
+- [ ] Register both repositories in `Program.cs`
+
+#### Seed data
+- [ ] Create `SeedData` class inside `Infrastructure/Data/`
+- [ ] Add at least 2 test spools with different materials and colors
+- [ ] Call `SeedData` on startup only if the database is empty
+- [ ] Run migrations automatically on startup
 
 </details>
 
 <details>
 <summary>Milestone 2 — Spool API</summary>
 
-- [ ] `GET /api/spools` — list all spools
-- [ ] `GET /api/spools/{id}` — get single spool
-- [ ] `POST /api/spools` — register new spool
-- [ ] `PATCH /api/spools/{id}/activate` — set active spool
-- [ ] `PATCH /api/spools/{id}/weight` — update weight manually
+#### DTOs
+- [ ] Create `SpoolResponse` record in `Application/DTOs/`
+- [ ] Create `RegisterSpoolRequest` record in `Application/DTOs/`
+- [ ] Create `UpdateWeightRequest` record in `Application/DTOs/`
+
+#### SpoolService
+- [ ] Create `ISpoolService` interface in `Application/Interfaces/`
+- [ ] Create `SpoolService` in `Application/Services/`
+- [ ] Add `GetAllAsync`, `GetByIdAsync`, `RegisterAsync`, `ActivateAsync`, `UpdateWeightAsync`
+- [ ] Register `ISpoolService` → `SpoolService` in `Program.cs`
+
+#### SpoolController
+- [ ] Create `SpoolController` in `API/Controllers/`
+- [ ] Add `GET /api/spools`
+- [ ] Add `GET /api/spools/{id}`
+- [ ] Add `POST /api/spools` — returns `201 Created`
+- [ ] Add `PATCH /api/spools/{id}/activate`
+- [ ] Add `PATCH /api/spools/{id}/weight`
+
+#### Swagger / Scalar
+- [ ] Install Swagger or Scalar NuGet package in `API`
+- [ ] Register and enable in `Development` environment only
+
+#### CORS
+- [ ] Add CORS policy in `Program.cs`
+- [ ] Allow frontend origin in development
+- [ ] Allow `https://spoolarr.local` in production
 
 </details>
 
 <details>
 <summary>Milestone 3 — NFC Scan Flow</summary>
 
-- [ ] `POST /api/spools/scan` — receives tag UID, routes to register or activate
-- [ ] `NfcScanService` — lookup by UID, return spool or "unknown tag"
-- [ ] `NfcScanHub` SignalR — push scan result to browser in real time
+#### Models
+- [ ] Create `NfcScanResult` record in `Domain/Models/`
+- [ ] Create `ScanRequest` record in `Domain/Models/`
+
+#### NfcScanService
+- [ ] Create `INfcScanService` in `Application/Interfaces/`
+- [ ] Create `NfcScanService` in `Application/Services/`
+- [ ] Return `"activated"` for known tag, `"unknown"` for unregistered tag
+- [ ] Register in `Program.cs`
+
+#### SignalR
+- [ ] Install `Microsoft.AspNetCore.SignalR`
+- [ ] Create `NfcScanHub` in `API/Hubs/`
+- [ ] Register SignalR and map hub to `/hubs/nfc` in `Program.cs`
+
+#### ScanController
+- [ ] Create `ScanController` in `API/Controllers/`
+- [ ] Add `POST /api/spools/scan`
+- [ ] Push `ScanResult` to all SignalR clients on every scan
 
 </details>
 
 <details>
 <summary>Milestone 4 — Bambu MQTT</summary>
 
-- [ ] `MqttListenerService` as `IHostedService`
-- [ ] Connect to printer on LAN using MQTTnet
+#### NuGet packages
+- [ ] Install `MQTTnet` in `Infrastructure`
+- [ ] Install `MQTTnet.Extensions.ManagedClient` in `Infrastructure`
+
+#### Settings
+- [ ] Create `BambuMqttSettings` in `Infrastructure/Settings/`
+- [ ] Add `BambuMqtt` section to `appsettings.json`
+- [ ] Register settings in `Program.cs`
+
+#### MqttListenerService
+- [ ] Create `MqttListenerService` in `Infrastructure/Services/`
+- [ ] Implement `IHostedService`
+- [ ] Connect to printer, subscribe to `device/{serial}/report`
 - [ ] Parse print-finish event, extract grams used
-- [ ] Deduct grams from active spool via `SpoolService`
-- [ ] Log `PrintJob` to DB
+- [ ] Deduct grams from active spool, log `PrintJob`
+- [ ] Add retry and reconnect logic
+- [ ] Register as hosted service in `Program.cs`
 
 </details>
 
 <details>
 <summary>Milestone 5 — Web UI</summary>
 
-- [ ] Spool list dashboard
-- [ ] Spool detail page
-- [ ] NFC scan page (Web NFC + QR fallback for iOS)
-- [ ] Register spool form
-- [ ] Active spool indicator
+#### Setup
+- [ ] Create frontend project in `src/`
+- [ ] Create `Dockerfile.web` in `docker/`
+- [ ] Add `web` service to `docker-compose.yml`
+- [ ] Set up environment variables for API base URL
+
+#### Pages
+- [ ] Dashboard `/` — spool list with color, weight, active badge
+- [ ] Scan page `/scan` — Web NFC on Android, QR fallback on iOS
+- [ ] Spool detail `/spools/:id` — full info and print history
+- [ ] Register form `/spools/register` — with NFC UID pre-filled
+
+#### SignalR
+- [ ] Connect to `/hubs/nfc`
+- [ ] Handle `ScanResult` event — show banner or open register form
 
 </details>
 
 <details>
 <summary>Milestone 6 — Alerts</summary>
 
-- [ ] Threshold check after every gram deduction
-- [ ] Webhook / ntfy push notification
+- [ ] Create `AlertSettings` in `Infrastructure/Settings/`
+- [ ] Create `IAlertService` in `Application/Interfaces/`
+- [ ] Create `AlertService` in `Application/Services/`
+- [ ] Send ntfy notification when weight drops below threshold
+- [ ] Send webhook when provider set to `"webhook"`
+- [ ] Add `POST /api/spools/{id}/test-alert` endpoint (dev only)
+- [ ] Wire alert check into `MqttListenerService` after every deduction
 
 </details>
 
 <details>
 <summary>Milestone 7 — AMS Support</summary>
 
-- [ ] Slot-to-spool mapping model
-- [ ] Multi-slot MQTT parsing
-- [ ] UI slot management
+- [ ] Create `AmsSlot` entity in `Domain/Models/`
+- [ ] Add `DbSet<AmsSlot>` to `FilamentDbContext`
+- [ ] Create `IAmsSlotRepository` and `AmsSlotRepository` in `Infrastructure/Repositories/`
+- [ ] Create `AmsController` in `API/Controllers/`
+- [ ] Add `GET /api/ams` and `PUT /api/ams/{unit}/{slot}`
+- [ ] Guard against assigning same spool to two slots — return `409`
+- [ ] Update `MqttListenerService` to parse AMS slot and deduct from correct spool
+- [ ] Add AMS slot panel to dashboard UI
 
 </details>
 
