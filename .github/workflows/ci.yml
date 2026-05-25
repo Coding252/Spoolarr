@@ -17,5 +17,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Placeholder - no build yet
-        run: echo "CI placeholder - dotnet build will be added in M0"
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore src/backend/backend.sln
+
+      - name: Build
+        run: dotnet build src/backend/backend.sln --no-restore --configuration Release

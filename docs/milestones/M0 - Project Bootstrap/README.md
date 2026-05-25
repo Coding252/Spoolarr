@@ -1,4 +1,4 @@
-# Milestone 0 — Project Bootstrap
+﻿# Milestone 0 — Project Bootstrap
 
 > Get the C# backend solution created, structured, and running inside Docker with a working database connection and health check.
 
@@ -19,45 +19,45 @@ Nothing. This is the first milestone.
 ## Tasks
 
 ### Folder preparation
-- [ ] Create `src/` folder at the root of the project
-- [ ] Create `src/backend/` inside `src/`
-- [ ] Create `src/backend/API/` inside `src/backend/`
-- [ ] Create `src/backend/API/Controllers/` inside `src/backend/API/`
-- [ ] Create `src/backend/API/Hubs/` inside `src/backend/API/`
-- [ ] Create `src/backend/Application/` inside `src/backend/`
-- [ ] Create `src/backend/Application/DTOs/` inside `src/backend/Application/`
-- [ ] Create `src/backend/Application/Interfaces/` inside `src/backend/Application/`
-- [ ] Create `src/backend/Application/Services/` inside `src/backend/Application/`
-- [ ] Create `src/backend/Domain/` inside `src/backend/`
-- [ ] Create `src/backend/Domain/Models/` inside `src/backend/Domain/`
-- [ ] Create `src/backend/Infrastructure/` inside `src/backend/`
-- [ ] Create `src/backend/Infrastructure/Data/` inside `src/backend/Infrastructure/`
-- [ ] Create `src/backend/Infrastructure/Repositories/` inside `src/backend/Infrastructure/`
-- [ ] Create `src/backend/Infrastructure/Services/` inside `src/backend/Infrastructure/`
-- [ ] Create `src/backend/Infrastructure/Settings/` inside `src/backend/Infrastructure/`
-- [ ] Create `src/backend/Test/` inside `src/backend/`
-- [ ] Create `src/backend/Test/Services/` inside `src/backend/Test/`
+- [x] Create `src/` folder at the root of the project
+- [x] Create `src/backend/` inside `src/`
+- [x] Create `src/backend/API/` inside `src/backend/`
+- [x] Create `src/backend/API/Controllers/` inside `src/backend/API/`
+- [x] Create `src/backend/API/Hubs/` inside `src/backend/API/`
+- [x] Create `src/backend/Application/` inside `src/backend/`
+- [x] Create `src/backend/Application/DTOs/` inside `src/backend/Application/`
+- [x] Create `src/backend/Application/Interfaces/` inside `src/backend/Application/`
+- [x] Create `src/backend/Application/Services/` inside `src/backend/Application/`
+- [x] Create `src/backend/Domain/` inside `src/backend/`
+- [x] Create `src/backend/Domain/Models/` inside `src/backend/Domain/`
+- [x] Create `src/backend/Infrastructure/` inside `src/backend/`
+- [x] Create `src/backend/Infrastructure/Data/` inside `src/backend/Infrastructure/`
+- [x] Create `src/backend/Infrastructure/Repositories/` inside `src/backend/Infrastructure/`
+- [x] Create `src/backend/Infrastructure/Services/` inside `src/backend/Infrastructure/`
+- [x] Create `src/backend/Infrastructure/Settings/` inside `src/backend/Infrastructure/`
+- [x] Create `src/backend/Test/` inside `src/backend/`
+- [x] Create `src/backend/Test/Services/` inside `src/backend/Test/`
 
 ### Solution setup
-- [ ] Create the solution file `backend.sln` inside `src/backend/`
-- [ ] Create the `API` ASP.NET Core Web API project inside `src/backend/`
-- [ ] Create the `Application` class library project inside `src/backend/`
-- [ ] Create the `Domain` class library project inside `src/backend/`
-- [ ] Create the `Infrastructure` class library project inside `src/backend/`
-- [ ] Create the `Test` project inside `src/backend/`
-- [ ] Add all 5 projects to `backend.sln`
+- [x] Create the solution file `backend.sln` inside `src/backend/`
+- [x] Create the `API` ASP.NET Core Web API project inside `src/backend/`
+- [x] Create the `Application` class library project inside `src/backend/`
+- [x] Create the `Domain` class library project inside `src/backend/`
+- [x] Create the `Infrastructure` class library project inside `src/backend/`
+- [x] Create the `Test` project inside `src/backend/`
+- [x] Add all 5 projects to `backend.sln`
 
 ### Project references
-- [ ] Add `Domain` reference to `Application`
-- [ ] Add `Application` reference to `API`
-- [ ] Add `Application` reference to `Infrastructure`
-- [ ] Add `Domain` reference to `Infrastructure`
-- [ ] Add `API` and `Infrastructure` reference to `Test`
+- [x] Add `Domain` reference to `Application`
+- [x] Add `Application` reference to `API`
+- [x] Add `Application` reference to `Infrastructure`
+- [x] Add `Domain` reference to `Infrastructure`
+- [x] Add `API` and `Infrastructure` reference to `Test`
 
 ### NuGet packages
-- [ ] Install `Microsoft.EntityFrameworkCore` in `src/backend/Infrastructure`
-- [ ] Install `Microsoft.EntityFrameworkCore.Sqlite` in `src/backend/Infrastructure`
-- [ ] Install `Microsoft.EntityFrameworkCore.Design` in `src/backend/Infrastructure`
+- [x] Install `Microsoft.EntityFrameworkCore` in `src/backend/Infrastructure`
+- [x] Install `Microsoft.EntityFrameworkCore.Sqlite` in `src/backend/Infrastructure`
+- [x] Install `Microsoft.EntityFrameworkCore.Design` in `src/backend/Infrastructure`
 
 ### Database
 - [ ] Create `FilamentDbContext` class inside `src/backend/Infrastructure/Data/`
