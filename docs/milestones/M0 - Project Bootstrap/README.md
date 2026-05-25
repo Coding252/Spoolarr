@@ -60,13 +60,13 @@ Nothing. This is the first milestone.
 - [x] Install `Microsoft.EntityFrameworkCore.Design` in `src/backend/Infrastructure`
 
 ### Database
-- [ ] Create `FilamentDbContext` class inside `src/backend/Infrastructure/Data/`
-- [ ] Add SQLite connection string to `appsettings.json` in `src/backend/API`
-- [ ] Register `FilamentDbContext` in `Program.cs`
+- [x] Create `FilamentDbContext` class inside `src/backend/Infrastructure/Data/`
+- [x] Add SQLite connection string to `appsettings.json` in `src/backend/API`
+- [x] Register `FilamentDbContext` in `Program.cs`
 
 ### Health check
-- [ ] Create `HealthController` inside `src/backend/API/Controllers/`
-- [ ] Add `GET /health` endpoint that returns `{ status: "ok", app: "Spoolarr" }`
+- [x] Create `HealthController` inside `src/backend/API/Controllers/`
+- [x] Add `GET /health` endpoint that returns `{ status: "ok", app: "Spoolarr" }`
 
 ### Docker
 - [ ] Write `Dockerfile.api` for the ASP.NET Core API
