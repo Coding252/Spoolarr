@@ -18,14 +18,34 @@ Nothing. This is the first milestone.
 
 ## Tasks
 
+### Folder preparation
+- [ ] Create `src/` folder at the root of the project
+- [ ] Create `src/backend/` inside `src/`
+- [ ] Create `src/backend/API/` inside `src/backend/`
+- [ ] Create `src/backend/API/Controllers/` inside `src/backend/API/`
+- [ ] Create `src/backend/API/Hubs/` inside `src/backend/API/`
+- [ ] Create `src/backend/Application/` inside `src/backend/`
+- [ ] Create `src/backend/Application/DTOs/` inside `src/backend/Application/`
+- [ ] Create `src/backend/Application/Interfaces/` inside `src/backend/Application/`
+- [ ] Create `src/backend/Application/Services/` inside `src/backend/Application/`
+- [ ] Create `src/backend/Domain/` inside `src/backend/`
+- [ ] Create `src/backend/Domain/Models/` inside `src/backend/Domain/`
+- [ ] Create `src/backend/Infrastructure/` inside `src/backend/`
+- [ ] Create `src/backend/Infrastructure/Data/` inside `src/backend/Infrastructure/`
+- [ ] Create `src/backend/Infrastructure/Repositories/` inside `src/backend/Infrastructure/`
+- [ ] Create `src/backend/Infrastructure/Services/` inside `src/backend/Infrastructure/`
+- [ ] Create `src/backend/Infrastructure/Settings/` inside `src/backend/Infrastructure/`
+- [ ] Create `src/backend/Test/` inside `src/backend/`
+- [ ] Create `src/backend/Test/Services/` inside `src/backend/Test/`
+
 ### Solution setup
-- [ ] Create the solution file `Spoolarr.sln`
-- [ ] Create the `API` ASP.NET Core Web API project inside `src/`
-- [ ] Create the `Application` class library project inside `src/`
-- [ ] Create the `Domain` class library project inside `src/`
-- [ ] Create the `Infrastructure` class library project inside `src/`
-- [ ] Create the `Test` project inside `src/`
-- [ ] Add all 5 projects to `Spoolarr.sln`
+- [ ] Create the solution file `backend.sln` inside `src/backend/`
+- [ ] Create the `API` ASP.NET Core Web API project inside `src/backend/`
+- [ ] Create the `Application` class library project inside `src/backend/`
+- [ ] Create the `Domain` class library project inside `src/backend/`
+- [ ] Create the `Infrastructure` class library project inside `src/backend/`
+- [ ] Create the `Test` project inside `src/backend/`
+- [ ] Add all 5 projects to `backend.sln`
 
 ### Project references
 - [ ] Add `Domain` reference to `Application`
@@ -35,33 +55,20 @@ Nothing. This is the first milestone.
 - [ ] Add `API` and `Infrastructure` reference to `Test`
 
 ### NuGet packages
-- [ ] Install `Microsoft.EntityFrameworkCore` in `Infrastructure`
-- [ ] Install `Microsoft.EntityFrameworkCore.Sqlite` in `Infrastructure`
-- [ ] Install `Microsoft.EntityFrameworkCore.Design` in `Infrastructure`
-
-### Project structure
-- [ ] Create `Controllers/` folder in `API`
-- [ ] Create `Hubs/` folder in `API`
-- [ ] Create `DTOs/` folder in `Application`
-- [ ] Create `Interfaces/` folder in `Application`
-- [ ] Create `Services/` folder in `Application`
-- [ ] Create `Models/` folder in `Domain`
-- [ ] Create `Data/` folder in `Infrastructure`
-- [ ] Create `Repositories/` folder in `Infrastructure`
-- [ ] Create `Services/` folder in `Infrastructure`
-- [ ] Create `Settings/` folder in `Infrastructure`
+- [ ] Install `Microsoft.EntityFrameworkCore` in `src/backend/Infrastructure`
+- [ ] Install `Microsoft.EntityFrameworkCore.Sqlite` in `src/backend/Infrastructure`
+- [ ] Install `Microsoft.EntityFrameworkCore.Design` in `src/backend/Infrastructure`
 
 ### Database
-- [ ] Create `FilamentDbContext` class inside `Infrastructure/Data/`
-- [ ] Add SQLite connection string to `appsettings.json` in `API`
+- [ ] Create `FilamentDbContext` class inside `src/backend/Infrastructure/Data/`
+- [ ] Add SQLite connection string to `appsettings.json` in `src/backend/API`
 - [ ] Register `FilamentDbContext` in `Program.cs`
 
 ### Health check
-- [ ] Create `HealthController` inside `API/Controllers/`
+- [ ] Create `HealthController` inside `src/backend/API/Controllers/`
 - [ ] Add `GET /health` endpoint that returns `{ status: "ok", app: "Spoolarr" }`
 
 ### Docker
-- [ ] Create `docker/` folder at the root of the project
 - [ ] Write `Dockerfile.api` for the ASP.NET Core API
 - [ ] Write `docker-compose.yml` with the API service and a persistent volume for SQLite
 - [ ] Write `Caddyfile` for HTTPS reverse proxy
