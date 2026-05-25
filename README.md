@@ -63,55 +63,58 @@ Spoolarr follows a **Clean Architecture** pattern split across 5 projects.
 ```
 Spoolarr/
 ├── src/
-│   ├── API/                          # Entry point — controllers, hubs, Program.cs
-│   │   ├── Controllers/
-│   │   │   ├── HealthController.cs
-│   │   │   ├── SpoolController.cs
-│   │   │   ├── ScanController.cs
-│   │   │   └── AmsController.cs
-│   │   ├── Hubs/
-│   │   │   └── NfcScanHub.cs
-│   │   ├── appsettings.json
-│   │   ├── appsettings.Development.json
-│   │   └── Program.cs
-│   │
-│   ├── Application/                  # Business logic — services, interfaces, DTOs
-│   │   ├── DTOs/
-│   │   │   └── SpoolDto.cs
-│   │   ├── Interfaces/
-│   │   │   ├── ISpoolService.cs
-│   │   │   └── INfcScanService.cs
-│   │   └── Services/
-│   │       ├── SpoolService.cs
-│   │       ├── NfcScanService.cs
-│   │       └── AlertService.cs
-│   │
-│   ├── Domain/                       # Pure C# models — no dependencies
-│   │   └── Models/
-│   │       ├── Spool.cs
-│   │       ├── PrintJob.cs
-│   │       ├── AmsSlot.cs
-│   │       └── NfcScanResult.cs
-│   │
-│   ├── Infrastructure/               # EF Core, repositories, MQTT, settings
-│   │   ├── Data/
-│   │   │   ├── FilamentDbContext.cs
-│   │   │   └── SeedData.cs
-│   │   ├── Repositories/
-│   │   │   ├── ISpoolRepository.cs
-│   │   │   ├── SpoolRepository.cs
-│   │   │   ├── IPrintJobRepository.cs
-│   │   │   ├── PrintJobRepository.cs
-│   │   │   ├── IAmsSlotRepository.cs
-│   │   │   └── AmsSlotRepository.cs
-│   │   ├── Services/
-│   │   │   └── MqttListenerService.cs
-│   │   └── Settings/
-│   │       ├── BambuMqttSettings.cs
-│   │       └── AlertSettings.cs
-│   │
-│   └── Test/                         # Unit tests
-│       └── Services/
+│   └── backend/
+│       ├── API/                          # Entry point — controllers, hubs, Program.cs
+│       │   ├── Controllers/
+│       │   │   ├── HealthController.cs
+│       │   │   ├── SpoolController.cs
+│       │   │   ├── ScanController.cs
+│       │   │   └── AmsController.cs
+│       │   ├── Hubs/
+│       │   │   └── NfcScanHub.cs
+│       │   ├── appsettings.json
+│       │   ├── appsettings.Development.json
+│       │   └── Program.cs
+│       │
+│       ├── Application/                  # Business logic — services, interfaces, DTOs
+│       │   ├── DTOs/
+│       │   │   └── SpoolDto.cs
+│       │   ├── Interfaces/
+│       │   │   ├── ISpoolService.cs
+│       │   │   └── INfcScanService.cs
+│       │   └── Services/
+│       │       ├── SpoolService.cs
+│       │       ├── NfcScanService.cs
+│       │       └── AlertService.cs
+│       │
+│       ├── Domain/                       # Pure C# models — no dependencies
+│       │   └── Models/
+│       │       ├── Spool.cs
+│       │       ├── PrintJob.cs
+│       │       ├── AmsSlot.cs
+│       │       └── NfcScanResult.cs
+│       │
+│       ├── Infrastructure/               # EF Core, repositories, MQTT, settings
+│       │   ├── Data/
+│       │   │   ├── FilamentDbContext.cs
+│       │   │   └── SeedData.cs
+│       │   ├── Repositories/
+│       │   │   ├── ISpoolRepository.cs
+│       │   │   ├── SpoolRepository.cs
+│       │   │   ├── IPrintJobRepository.cs
+│       │   │   ├── PrintJobRepository.cs
+│       │   │   ├── IAmsSlotRepository.cs
+│       │   │   └── AmsSlotRepository.cs
+│       │   ├── Services/
+│       │   │   └── MqttListenerService.cs
+│       │   └── Settings/
+│       │       ├── BambuMqttSettings.cs
+│       │       └── AlertSettings.cs
+│       │
+│       ├── Test/                         # Unit tests
+│       │   └── Services/
+│       │
+│       └── backend.sln
 │
 ├── docker/
 │   ├── docker-compose.yml
