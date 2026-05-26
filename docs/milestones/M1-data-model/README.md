@@ -6,7 +6,7 @@
 
 ## Goal
 
-By the end of this milestone the database has the correct tables for spools and print jobs, repositories are in place to read and write data, and seed data exists so you can test without manually inserting rows.
+By the end of this milestone the database has the correct tables for spools and prints, repositories are in place to read and write data, and seed data exists so you can test without manually inserting rows.
 
 ---
 
@@ -20,7 +20,8 @@ By the end of this milestone the database has the correct tables for spools and 
 
 ### Models
 - [ ] Create `Spool` entity class inside `Domain/Models/`
-- [ ] Create `PrintJob` entity class inside `Domain/Models/`
+- [ ] Create `Print` entity class inside `Domain/Models/`
+- [ ] Create `PrintSource` enum inside `Domain/Models/` with values: `Mqtt`, `Nfc`, `Manual`
 
 ### Spool fields
 - [ ] `Id` — Guid, primary key
@@ -28,76 +29,85 @@ By the end of this milestone the database has the correct tables for spools and 
 - [ ] `Brand` — string
 - [ ] `Material` — string
 - [ ] `ColorName` — string
-- [ ] `ColorHex` — string
-- [ ] `InitialWeightG` — float
-- [ ] `CurrentWeightG` — float
-- [ ] `LowStockThresholdG` — float, default 100g
+- [ ] `ColorHex` — string, format `#RRGGBB`
+- [ ] `InitialWeightG` — double
+- [ ] `CurrentWeightG` — double
+- [ ] `LowStockThresholdG` — double, default 100
 - [ ] `IsActive` — bool, default false
 - [ ] `CreatedAt` — DateTime
+- [ ] `UpdatedAt` — DateTime
 - [ ] `LastScannedAt` — DateTime, nullable
 - [ ] `Notes` — string, nullable
-- [ ] `PrintJobs` — navigation property to `PrintJob`
+- [ ] `Prints` — navigation property to `Print`
 
-### PrintJob fields
-- [ ] `Id` — Guid, primary key
+### Print fields
+- [ ] `Id` — Guid, primary key (internal)
 - [ ] `SpoolId` — Guid, foreign key to `Spool`
-- [ ] `GramsUsed` — float
-- [ ] `PrintName` — string, nullable
+- [ ] `BambuTaskId` — string, nullable — Bambu MQTT `task_id` (unique job ID assigned by Bambu)
+- [ ] `BambuSerialNumber` — string, nullable — Bambu MQTT `subtask_id` (unique serial per print run)
+- [ ] `Name` — string, nullable — Bambu MQTT `subtask_name` (print file name e.g. `model.3mf`)
+- [ ] `GcodeFile` — string, nullable — Bambu MQTT `gcode_file` (gcode path on the printer)
+- [ ] `GramsUsed` — double
 - [ ] `PrintedAt` — DateTime
-- [ ] `Source` — string, default `"mqtt"`
+- [ ] `Source` — `PrintSource` enum, default `PrintSource.Mqtt`
 - [ ] `Spool` — navigation property to `Spool`
 
 ### Database context
 - [ ] Add `DbSet<Spool>` to `FilamentDbContext`
-- [ ] Add `DbSet<PrintJob>` to `FilamentDbContext`
+- [ ] Add `DbSet<Print>` to `FilamentDbContext`
 - [ ] Configure unique index on `Spool.NfcTagUid`
-- [ ] Configure cascade delete — deleting a spool deletes its print jobs
-- [ ] Configure foreign key relationship between `PrintJob` and `Spool`
+- [ ] Configure index on `Print.BambuTaskId` — for fast MQTT job lookup
+- [ ] Configure index on `Print.BambuSerialNumber` — for fast serial lookup
+- [ ] Configure cascade delete — deleting a spool deletes its prints
+- [ ] Configure foreign key relationship between `Print` and `Spool`
+- [ ] Configure `PrintSource` to be stored as a string in the database (use `HasConversion<string>()`)
 
 ### Migrations
-- [ ] Run `dotnet ef migrations add InitialCreate` — run from the `Infrastructure` project
-- [ ] Run `dotnet ef database update` — run from the `Infrastructure` project
-- [ ] Confirm `Spools` and `PrintJobs` tables are created in the SQLite file
+- [ ] Run migrations add from `src/backend/` — `dotnet ef migrations add InitialCreate --project Infrastructure --startup-project API`
+- [ ] Run database update from `src/backend/` — `dotnet ef database update --project Infrastructure --startup-project API`
+- [ ] Confirm `Spools` and `Prints` tables are created in the SQLite file
 
 ### Repositories
-- [ ] Create `ISpoolRepository` interface inside `Infrastructure/Repositories/`
-- [ ] Create `SpoolRepository` class implementing `ISpoolRepository`
-- [ ] Add `GetAllAsync` — return all spools ordered by last scanned
-- [ ] Add `GetByIdAsync` — return spool by ID including print jobs
+- [ ] Create `ISpoolRepository` interface inside `Application/Interfaces/`
+- [ ] Create `SpoolRepository` class inside `Infrastructure/Repositories/` implementing `ISpoolRepository`
+- [ ] Add `GetAllAsync` — return all spools ordered by `LastScannedAt` descending
+- [ ] Add `GetByIdAsync` — return spool by ID including prints
 - [ ] Add `GetByNfcTagUidAsync` — return spool by NFC tag UID
 - [ ] Add `GetActiveAsync` — return the currently active spool
 - [ ] Add `CreateAsync` — insert new spool
 - [ ] Add `UpdateAsync` — update existing spool
 - [ ] Add `DeleteAsync` — delete spool by ID
-- [ ] Create `IPrintJobRepository` interface inside `Infrastructure/Repositories/`
-- [ ] Create `PrintJobRepository` class implementing `IPrintJobRepository`
-- [ ] Add `GetBySpoolIdAsync` — return all print jobs for a spool ordered by date
-- [ ] Add `CreateAsync` — insert new print job
+- [ ] Create `IPrintRepository` interface inside `Application/Interfaces/`
+- [ ] Create `PrintRepository` class inside `Infrastructure/Repositories/` implementing `IPrintRepository`
+- [ ] Add `GetBySpoolIdAsync` — return all prints for a spool ordered by `PrintedAt` descending
+- [ ] Add `GetByIdAsync` — return a single print by ID
+- [ ] Add `CreateAsync` — insert new print
 
 ### Dependency injection
 - [ ] Register `ISpoolRepository` → `SpoolRepository` in `Program.cs`
-- [ ] Register `IPrintJobRepository` → `PrintJobRepository` in `Program.cs`
+- [ ] Register `IPrintRepository` → `PrintRepository` in `Program.cs`
 
 ### Seed data
 - [ ] Create `SeedData` class inside `Infrastructure/Data/`
-- [ ] Add at least 2 test spools with different materials and colors
-- [ ] Call `SeedData` on app startup only if the database is empty
-- [ ] Run migrations automatically on app startup
-- [ ] Handle the case where the database file already exists — do not re-seed
+- [ ] Add 2 test spools with realistic data (e.g. Bambu PLA Basic Black, Bambu PETG Basic White)
+- [ ] Call `SeedData` on app startup only if the `Spools` table is empty
+- [ ] Run migrations automatically on app startup before seeding
+- [ ] Do not re-seed if data already exists
 
 ### Error handling
-- [ ] Wrap migration on startup in try/catch — log error and continue if migration fails
+- [ ] Wrap migration and seed on startup in try/catch — log the error and continue if it fails
 - [ ] Log a clear message if the database file cannot be created or accessed
 
 ---
 
 ## Definition of Done
 
-- [ ] `Spools` and `PrintJobs` tables exist in the SQLite database
-- [ ] `NfcTagUid` has a unique index
-- [ ] Cascade delete works — deleting a spool removes its print jobs
+- [ ] `Spools` and `Prints` tables exist in the SQLite database
+- [ ] `Spool.NfcTagUid` has a unique index
+- [ ] `Print.BambuTaskId` and `Print.BambuSerialNumber` have indexes
+- [ ] Cascade delete works — deleting a spool removes its prints
 - [ ] Both repositories registered in DI and resolve without errors
-- [ ] Seed data inserts test spools on first run only
+- [ ] Seed data inserts 2 test spools on first run only
 - [ ] `dotnet ef migrations list` shows `InitialCreate` as applied
 - [ ] Inserting a duplicate `NfcTagUid` throws a database constraint error
-- [ ] Deleting a spool also deletes all its associated print jobs (cascade delete verified)
+- [ ] `PrintSource` is stored as a string in the database (not an integer)
