@@ -178,14 +178,14 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 
 ```
 M0 — Bootstrap
- ├── M8 — Docker & Deployment
- └── M1 — Data Model
-      └── M2 — Spool API
-           ├── M3 — NFC Scan Flow
-           │    └── M5 — Web UI
-           └── M4 — Bambu MQTT
-                ├── M6 — Alerts
-                └── M7 — AMS Support
+ ├── M1 — Data Model
+ │    └── M2 — Spool API
+ │         ├── M3 — NFC Scan Flow
+ │         │    └── M5 — Web UI
+ │         └── M4 — Bambu MQTT
+ │              ├── M6 — Alerts
+ │              └── M7 — AMS Support
+ └── M8 — Docker & Deployment
 ```
 
 ---
