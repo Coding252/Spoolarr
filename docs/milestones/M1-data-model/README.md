@@ -21,7 +21,6 @@ By the end of this milestone the database has the correct tables for spools and 
 ### Models
 - [ ] Create `Spool` entity class inside `Domain/Models/`
 - [ ] Create `Print` entity class inside `Domain/Models/`
-- [ ] Create `PrintSource` enum inside `Domain/Models/` with values: `Mqtt`, `Nfc`, `Manual`
 
 ### Spool fields
 - [ ] `Id` — Guid, primary key
@@ -49,7 +48,7 @@ By the end of this milestone the database has the correct tables for spools and 
 - [ ] `GcodeFile` — string, nullable — Bambu MQTT `gcode_file` (gcode path on the printer)
 - [ ] `GramsUsed` — double
 - [ ] `PrintedAt` — DateTime
-- [ ] `Source` — `PrintSource` enum, default `PrintSource.Mqtt`
+- [ ] `Source` — string, default `"mqtt"`
 - [ ] `Spool` — navigation property to `Spool`
 
 ### Database context
@@ -60,7 +59,6 @@ By the end of this milestone the database has the correct tables for spools and 
 - [ ] Configure index on `Print.BambuSerialNumber` — for fast serial lookup
 - [ ] Configure cascade delete — deleting a spool deletes its prints
 - [ ] Configure foreign key relationship between `Print` and `Spool`
-- [ ] Configure `PrintSource` to be stored as a string in the database (use `HasConversion<string>()`)
 
 ### Migrations
 - [ ] Run migrations add from `src/backend/` — `dotnet ef migrations add InitialCreate --project Infrastructure --startup-project API`
@@ -110,4 +108,3 @@ By the end of this milestone the database has the correct tables for spools and 
 - [ ] Seed data inserts 2 test spools on first run only
 - [ ] `dotnet ef migrations list` shows `InitialCreate` as applied
 - [ ] Inserting a duplicate `NfcTagUid` throws a database constraint error
-- [ ] `PrintSource` is stored as a string in the database (not an integer)
