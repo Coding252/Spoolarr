@@ -69,8 +69,8 @@ Nothing. This is the first milestone.
 - [x] Add `GET /health` endpoint that returns `{ status: "ok", app: "Spoolarr" }`
 
 ### Environment config
-- [ ] Create `appsettings.Development.json` for local dev
-- [ ] Set SQLite connection string in `appsettings.Development.json` pointing to a local file path
+- [x] Create `appsettings.Development.json` for local dev
+- [x] Set SQLite connection string in `appsettings.Development.json` pointing to a local file path
 
 ### Git
 - [ ] Create `.gitignore` file at the root of the project
