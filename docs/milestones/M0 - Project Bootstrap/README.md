@@ -1,12 +1,12 @@
-﻿# Milestone 0 — Project Bootstrap
+# Milestone 0 — Project Bootstrap
 
-> Get the C# backend solution created, structured, and running inside Docker with a working database connection and health check.
+> Get the C# backend solution created, structured, and running locally with a working database connection and health check.
 
 ---
 
 ## Goal
 
-By the end of this milestone the ASP.NET Core API is running inside Docker, connected to a SQLite database, and responding to a health check endpoint. No features yet — just a solid foundation to build on.
+By the end of this milestone the ASP.NET Core API is running locally, connected to a SQLite database, and responding to a health check endpoint. No features yet — just a solid foundation to build on.
 
 ---
 
@@ -68,35 +68,23 @@ Nothing. This is the first milestone.
 - [x] Create `HealthController` inside `src/backend/API/Controllers/`
 - [x] Add `GET /health` endpoint that returns `{ status: "ok", app: "Spoolarr" }`
 
-### Docker
-- [x] Write `Dockerfile.api` for the ASP.NET Core API
-- [ ] Write `docker-compose.yml` with the API service and a persistent volume for SQLite
-- [ ] Write `Caddyfile` for HTTPS reverse proxy
-- [ ] Add Caddy service to `docker-compose.yml`
-- [ ] Test `docker compose up --build` runs without errors
-
 ### Environment config
-- [ ] Add `ASPNETCORE_ENVIRONMENT` to docker-compose
-- [ ] Make sure SQLite database file is stored in the persistent volume `/data/spoolarr.db`
-- [ ] Create `appsettings.Development.json` for local dev outside Docker
-- [ ] Set different connection string in `appsettings.Development.json` pointing to a local file path
+- [ ] Create `appsettings.Development.json` for local dev
+- [ ] Set SQLite connection string in `appsettings.Development.json` pointing to a local file path
 
 ### Git
 - [ ] Create `.gitignore` file at the root of the project
 - [ ] Ignore `bin/`, `obj/`, `*.db`, `*.db-shm`, `*.db-wal`, `.env`, `appsettings.*.json` (except default)
 
 ### Manual verification
-- [ ] Run the API locally with `dotnet run` outside Docker and confirm health check responds
-- [ ] Run the API inside Docker with `docker compose up --build` and confirm health check responds
-- [ ] Confirm the SQLite file is created at the correct path in both environments
+- [ ] Run the API locally with `dotnet run` and confirm `GET /health` returns `200 OK`
+- [ ] Confirm the SQLite file is created at the local path defined in `appsettings.Development.json`
 
 ---
 
 ## Definition of Done
 
 - [ ] `dotnet build` passes with no errors
-- [ ] `docker compose up --build` starts without errors
-- [ ] `GET /health` returns `200 OK`
-- [ ] SQLite file is created at `/data/spoolarr.db` on container start
-- [ ] Caddy proxies HTTPS traffic to the API on the local network
-- [ ] Health endpoint responds correctly in both local dev and Docker environments
+- [ ] `GET /health` returns `200 OK` when running locally with `dotnet run`
+- [ ] SQLite file is created at the local path on first run
+- [ ] Health endpoint responds correctly in local dev environment

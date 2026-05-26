@@ -8,7 +8,7 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 
 | Milestone | Description | Status |
 |---|---|---|
-| [M0 — Project Bootstrap](#milestone-0--project-bootstrap) | Solution, Docker, Caddy, EF Core, health check | ⬜ Not started |
+| [M0 — Project Bootstrap](#milestone-0--project-bootstrap) | Solution, EF Core, health check | 🔄 In progress |
 | [M1 — Data Model](#milestone-1--data-model) | Entities, migrations, repositories, seed data | ⬜ Not started |
 | [M2 — Spool API](#milestone-2--spool-api) | REST endpoints for spool management | ⬜ Not started |
 | [M3 — NFC Scan Flow](#milestone-3--nfc-scan-flow) | Scan endpoint, NfcScanService, SignalR | ⬜ Not started |
@@ -16,6 +16,7 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 | [M5 — Web UI](#milestone-5--web-ui) | Dashboard, scan page, Web NFC, QR fallback | ⬜ Not started |
 | [M6 — Alerts](#milestone-6--alerts) | Low stock threshold, ntfy / webhook | ⬜ Not started |
 | [M7 — AMS Support](#milestone-7--ams-support) | Multi-slot mapping, AMS MQTT, slot UI | ⬜ Not started |
+| [M8 — Docker & Deployment](#milestone-8--docker--deployment) | Dockerfile, Docker Compose, Caddy HTTPS, container verification | ⬜ Not started |
 
 ---
 
@@ -155,10 +156,29 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 
 ---
 
+## Milestone 8 — Docker & Deployment
+
+> Containerize the API with Docker, add a Caddy HTTPS reverse proxy, and verify the full stack runs correctly inside Docker.
+
+📄 [Full milestone README](milestones/M8-docker/README.md)
+
+**Depends on:** M0
+
+### Tasks
+
+- [ ] Write `docker-compose.yml` with API service and SQLite volume
+- [ ] Write `Caddyfile` for HTTPS reverse proxy
+- [ ] Add Caddy service to `docker-compose.yml`
+- [ ] Configure environment variables in `docker-compose.yml`
+- [ ] Verify `docker compose up --build` runs without errors
+
+---
+
 ## Dependency Graph
 
 ```
 M0 — Bootstrap
+ ├── M8 — Docker & Deployment
  └── M1 — Data Model
       └── M2 — Spool API
            ├── M3 — NFC Scan Flow
