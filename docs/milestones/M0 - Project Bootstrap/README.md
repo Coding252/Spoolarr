@@ -73,8 +73,8 @@ Nothing. This is the first milestone.
 - [x] Set SQLite connection string in `appsettings.Development.json` pointing to a local file path
 
 ### Git
-- [ ] Create `.gitignore` file at the root of the project
-- [ ] Ignore `bin/`, `obj/`, `*.db`, `*.db-shm`, `*.db-wal`, `.env`, `appsettings.*.json` (except default)
+- [x] Create `.gitignore` file at the root of the project
+- [x] Ignore `bin/`, `obj/`, `*.db`, `*.db-shm`, `*.db-wal`, `.env`, `appsettings.*.json` (except default)
 
 ### Manual verification
 - [ ] Run the API locally with `dotnet run` and confirm `GET /health` returns `200 OK`
