@@ -69,7 +69,7 @@ Nothing. This is the first milestone.
 - [x] Add `GET /health` endpoint that returns `{ status: "ok", app: "Spoolarr" }`
 
 ### Docker
-- [ ] Write `Dockerfile.api` for the ASP.NET Core API
+- [x] Write `Dockerfile.api` for the ASP.NET Core API
 - [ ] Write `docker-compose.yml` with the API service and a persistent volume for SQLite
 - [ ] Write `Caddyfile` for HTTPS reverse proxy
 - [ ] Add Caddy service to `docker-compose.yml`
