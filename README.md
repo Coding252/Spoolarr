@@ -192,7 +192,7 @@ Each milestone has its own detailed README with tasks and definition of done.
 
 | Milestone | Description | Status |
 |---|---|---|
-| [M0 — Project Bootstrap](docs/milestones/M0-bootstrap/README.md) | Solution setup, Docker, Caddy, EF Core, health endpoint | ⬜ Not started |
+| [M0 — Project Bootstrap](docs/milestones/M0%20-%20Project%20Bootstrap/README.md) | Solution setup, EF Core, health endpoint | 🔄 In progress |
 | [M1 — Data Model](docs/milestones/M1-data-model/README.md) | `Spool` + `PrintJob` entities, migrations, repositories, seed data | ⬜ Not started |
 | [M2 — Spool API](docs/milestones/M2-spool-api/README.md) | REST endpoints for spool management | ⬜ Not started |
 | [M3 — NFC Scan Flow](docs/milestones/M3-nfc-scan/README.md) | Scan endpoint, `NfcScanService`, SignalR real-time push | ⬜ Not started |
@@ -200,6 +200,7 @@ Each milestone has its own detailed README with tasks and definition of done.
 | [M5 — Web UI](docs/milestones/M5-web-ui/README.md) | Dashboard, scan page, Web NFC, QR fallback, register form | ⬜ Not started |
 | [M6 — Alerts](docs/milestones/M6-alerts/README.md) | Low stock threshold check, ntfy / webhook notifications | ⬜ Not started |
 | [M7 — AMS Support](docs/milestones/M7-ams/README.md) | Multi-slot mapping, AMS MQTT parsing, slot UI | ⬜ Not started |
+| [M8 — Docker & Deployment](docs/milestones/M8-docker/README.md) | Dockerfile, Docker Compose, Caddy HTTPS proxy, container verification | ⬜ Not started |
 
 ### Task checklist
 
