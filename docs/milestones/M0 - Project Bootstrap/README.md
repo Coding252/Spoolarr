@@ -77,14 +77,14 @@ Nothing. This is the first milestone.
 - [x] Ignore `bin/`, `obj/`, `*.db`, `*.db-shm`, `*.db-wal`, `.env`, `appsettings.*.json` (except default)
 
 ### Manual verification
-- [ ] Run the API locally with `dotnet run` and confirm `GET /health` returns `200 OK`
-- [ ] Confirm the SQLite file is created at the local path defined in `appsettings.Development.json`
+- [x] Run the API locally with `dotnet run` and confirm `GET /health` returns `200 OK`
+- [x] Confirm the SQLite file is created at the local path defined in `appsettings.Development.json`
 
 ---
 
 ## Definition of Done
 
-- [ ] `dotnet build` passes with no errors
-- [ ] `GET /health` returns `200 OK` when running locally with `dotnet run`
-- [ ] SQLite file is created at the local path on first run
-- [ ] Health endpoint responds correctly in local dev environment
+- [x] `dotnet build` passes with no errors
+- [x] `GET /health` returns `200 OK` when running locally with `dotnet run`
+- [x] SQLite file is created at the local path on first run
+- [x] Health endpoint responds correctly in local dev environment
