@@ -127,14 +127,14 @@ By the end of this milestone the database has four tables — `Spools`, `Printer
 - [x] Add `DeleteAsync` — delete printer by ID
 
 ### PrintJob repository
-- [ ] Create `IPrintJobRepository` interface inside `src/back-end/Infrastructure/Repositories/`
-- [ ] Create `PrintJobRepository` class implementing `IPrintJobRepository`
-- [ ] Add `GetBySpoolIdAsync` — return all print jobs for a spool ordered by date
-- [ ] Add `GetByPrinterIdAsync` — return all print jobs for a printer ordered by date
-- [ ] Add `GetRunningAsync` — return all jobs with status `"running"`
-- [ ] Add `GetByIdAsync` — return job by ID
-- [ ] Add `CreateAsync` — insert new print job
-- [ ] Add `UpdateAsync` — update existing print job (status, grams, finished date)
+- [x] Create `IPrintJobRepository` interface inside `src/back-end/Infrastructure/Repositories/`
+- [x] Create `PrintJobRepository` class implementing `IPrintJobRepository`
+- [x] Add `GetBySpoolIdAsync` — return all print jobs for a spool ordered by date
+- [x] Add `GetByPrinterIdAsync` — return all print jobs for a printer ordered by date
+- [x] Add `GetRunningAsync` — return all jobs with status `"running"`
+- [x] Add `GetByIdAsync` — return job by ID
+- [x] Add `CreateAsync` — insert new print job
+- [x] Add `UpdateAsync` — update existing print job (status, grams, finished date)
 
 ### NfcTag repository
 - [ ] Create `INfcTagRepository` interface inside `src/back-end/Infrastructure/Repositories/`
