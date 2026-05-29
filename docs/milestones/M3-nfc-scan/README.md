@@ -18,44 +18,53 @@ By the end of this milestone tapping a phone to a spool triggers a scan event th
 
 ---
 
+## Context from M2
+
+The following are already in place from Milestone 2:
+
+- `ISpoolService` with `ActivateAsync(Guid id)` — activates a spool by ID, deactivates the previous one, sets `LastScannedAt`
+- `INfcTagRepository` with `GetByTagUidAsync(string tagUid)` — looks up an NFC tag by UID, includes the linked `Spool`
+- `SpoolResponse` DTO in `src/backend/Application/DTOs/` — used as the spool payload in scan results
+- CORS policy registered in `Program.cs` — needs `AllowCredentials()` added for SignalR WebSocket connections
+- SignalR is part of `Microsoft.AspNetCore.App` — no extra NuGet package needed
+
+---
+
 ## Tasks
 
-### NuGet packages
-- [ ] Install `Microsoft.AspNetCore.SignalR` in `API`
-
-### Models
-- [ ] Create `NfcScanResult` record inside `Domain/Models/`
+### DTOs
+- [ ] Create `ScanRequest` record inside `src/backend/Application/DTOs/`
+- [ ] Add `TagUid` field — string, `[Required]`
+- [ ] Create `NfcScanResult` record inside `src/backend/Application/DTOs/`
 - [ ] Add `Status` field — string, values: `"activated"` or `"unknown"`
 - [ ] Add `TagUid` field — string
-- [ ] Add `Spool` field — `SpoolResponse`, nullable
+- [ ] Add `Spool` field — `SpoolResponse?`, nullable
 - [ ] Add `Message` field — string, nullable
-- [ ] Create `ScanRequest` record inside `Domain/Models/`
-- [ ] Add `TagUid` field — string
 
 ### NfcScanService
-- [ ] Create `INfcScanService` interface inside `Application/Interfaces/`
-- [ ] Create `NfcScanService` class inside `Application/Services/` implementing `INfcScanService`
-- [ ] Add `ProcessScanAsync` — takes tag UID, returns `NfcScanResult`
-- [ ] If tag UID not found in DB → return status `"unknown"` with no spool
-- [ ] If tag UID found in DB → activate spool, return status `"activated"` with spool data
-- [ ] Register `INfcScanService` → `NfcScanService` in `Program.cs`
+- [ ] Create `INfcScanService` interface inside `src/backend/Application/Interfaces/`
+- [ ] Create `NfcScanService` class inside `src/backend/Application/Services/` implementing `INfcScanService`
+- [ ] Add `ProcessScanAsync` — takes tag UID string, returns `NfcScanResult`
+- [ ] If tag UID not found in DB → return `NfcScanResult` with `Status = "unknown"`, null spool
+- [ ] If tag UID found → call `ISpoolService.ActivateAsync`, return `Status = "activated"` with spool data
+- [ ] Register `INfcScanService` → `NfcScanService` as scoped in `Program.cs`
 
 ### SignalR hub
-- [ ] Create `NfcScanHub` class inside `API/Hubs/`
+- [ ] Create `NfcScanHub` class inside `src/backend/API/Hubs/`
 - [ ] Register SignalR in `Program.cs` via `builder.Services.AddSignalR()`
 - [ ] Map hub endpoint to `/hubs/nfc` in `Program.cs`
 
 ### ScanController
-- [ ] Create `ScanController` inside `API/Controllers/`
-- [ ] Add `POST /api/spools/scan` endpoint
+- [ ] Create `ScanController` inside `src/backend/API/Controllers/`
+- [ ] Add `POST /api/spools/scan` endpoint accepting `ScanRequest` body
 - [ ] Validate `TagUid` is not empty — return `400` if missing
-- [ ] Call `NfcScanService.ProcessScanAsync` with the tag UID
-- [ ] Push `NfcScanResult` to all SignalR clients via `NfcScanHub`
+- [ ] Call `INfcScanService.ProcessScanAsync` with the tag UID
+- [ ] Push `NfcScanResult` to all SignalR clients via `IHubContext<NfcScanHub>`
 - [ ] Return `200 OK` with the `NfcScanResult`
 
 ### CORS for SignalR
-- [ ] Ensure CORS policy allows SignalR WebSocket connections from the frontend origin
-- [ ] Test SignalR connection is not blocked in the browser console
+- [ ] Add `AllowCredentials()` to CORS policies in `Program.cs` — required for SignalR WebSocket handshake
+- [ ] Explicit origins already set from M2 (`WithOrigins(...)`) — required when using `AllowCredentials()`
 
 ### Error handling
 - [ ] Return `400 Bad Request` if `TagUid` is null or empty
@@ -70,7 +79,18 @@ By the end of this milestone tapping a phone to a spool triggers a scan event th
 |---|---|---|
 | `POST` | `/api/spools/scan` | `200` NfcScanResult |
 
-### Scan result values
+### NfcScanResult shape
+
+```json
+{
+  "status": "activated",
+  "tagUid": "04:A1:B2:C3:D4:E5:F6",
+  "spool": { "id": "...", "brand": "Bambu", "material": "PLA" },
+  "message": null
+}
+```
+
+### Status values
 
 | Status | Meaning |
 |---|---|
@@ -83,6 +103,7 @@ By the end of this milestone tapping a phone to a spool triggers a scan event th
 
 - [ ] `POST /api/spools/scan` with known UID activates spool and returns `"activated"`
 - [ ] `POST /api/spools/scan` with unknown UID returns `"unknown"` with null spool
+- [ ] `POST /api/spools/scan` with empty `TagUid` returns `400`
 - [ ] SignalR hub is accessible at `/hubs/nfc`
 - [ ] `ScanResult` SignalR event fires on every scan
 - [ ] Both known and unknown tag scenarios tested with Postman or curl
