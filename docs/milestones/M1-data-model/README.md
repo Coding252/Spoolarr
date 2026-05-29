@@ -160,8 +160,8 @@ By the end of this milestone the database has four tables — `Spools`, `Printer
 - [x] Handle the case where the database file already exists — do not re-seed
 
 ### Error handling
-- [ ] Wrap migration on startup in try/catch — log error and continue if migration fails
-- [ ] Log a clear message if the database file cannot be created or accessed
+- [x] Wrap migration on startup in try/catch — log error and continue if migration fails
+- [x] Log a clear message if the database file cannot be created or accessed
 
 ---
 
