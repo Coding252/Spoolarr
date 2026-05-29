@@ -186,7 +186,7 @@ Each milestone has its own detailed README with tasks and definition of done.
 |---|---|---|
 | [M0 — Project Bootstrap](docs/milestones/M0%20-%20Project%20Bootstrap/README.md) | Solution setup, EF Core, health endpoint | ✅ Done |
 | [M1 — Data Model](docs/milestones/M1-data-model/README.md) | `Spool`, `Printer`, `PrintJob`, `NfcTag` entities, migrations, repositories, seed data | ✅ Done |
-| [M2 — Spool API](docs/milestones/M2-spool-api/README.md) | REST endpoints for spool management | 🔄 In progress |
+| [M2 — Spool API](docs/milestones/M2-spool-api/README.md) | REST endpoints for spool management | ✅ Done |
 | [M3 — NFC Scan Flow](docs/milestones/M3-nfc-scan/README.md) | Scan endpoint, `NfcScanService`, SignalR real-time push | ⬜ Not started |
 | [M4 — Bambu MQTT](docs/milestones/M4-bambu-mqtt/README.md) | MQTT listener, print-finish event, auto gram deduction | ⬜ Not started |
 | [M5 — Web UI](docs/milestones/M5-web-ui/README.md) | Dashboard, scan page, Web NFC, QR fallback, register form | ⬜ Not started |
@@ -371,32 +371,32 @@ Each milestone has its own detailed README with tasks and definition of done.
 <summary>Milestone 2 — Spool API</summary>
 
 #### DTOs
-- [ ] Create `SpoolResponse` record in `Application/DTOs/`
-- [ ] Create `RegisterSpoolRequest` record in `Application/DTOs/`
-- [ ] Create `UpdateWeightRequest` record in `Application/DTOs/`
+- [x] Create `SpoolResponse` record in `Application/DTOs/`
+- [x] Create `RegisterSpoolRequest` record in `Application/DTOs/`
+- [x] Create `UpdateWeightRequest` record in `Application/DTOs/`
 
 #### SpoolService
-- [ ] Create `ISpoolService` interface in `Application/Interfaces/`
-- [ ] Create `SpoolService` in `Application/Services/`
-- [ ] Add `GetAllAsync`, `GetByIdAsync`, `RegisterAsync`, `ActivateAsync`, `UpdateWeightAsync`
-- [ ] Register `ISpoolService` → `SpoolService` in `Program.cs`
+- [x] Create `ISpoolService` interface in `Application/Interfaces/`
+- [x] Create `SpoolService` in `Application/Services/`
+- [x] Add `GetAllAsync`, `GetByIdAsync`, `RegisterAsync`, `ActivateAsync`, `UpdateWeightAsync`
+- [x] Register `ISpoolService` → `SpoolService` in `Program.cs`
 
 #### SpoolController
-- [ ] Create `SpoolController` in `API/Controllers/`
-- [ ] Add `GET /api/spools`
-- [ ] Add `GET /api/spools/{id}`
-- [ ] Add `POST /api/spools` — returns `201 Created`
-- [ ] Add `PATCH /api/spools/{id}/activate`
-- [ ] Add `PATCH /api/spools/{id}/weight`
+- [x] Create `SpoolController` in `API/Controllers/`
+- [x] Add `GET /api/spools`
+- [x] Add `GET /api/spools/{id}`
+- [x] Add `POST /api/spools` — returns `201 Created`
+- [x] Add `PATCH /api/spools/{id}/activate`
+- [x] Add `PATCH /api/spools/{id}/weight`
 
 #### Swagger / Scalar
-- [ ] Install Swagger or Scalar NuGet package in `API`
-- [ ] Register and enable in `Development` environment only
+- [x] Install `Scalar.AspNetCore` NuGet package in `API`
+- [x] Register and enable in `Development` environment only
 
 #### CORS
-- [ ] Add CORS policy in `Program.cs`
-- [ ] Allow frontend origin in development
-- [ ] Allow `https://spoolarr.local` in production
+- [x] Add CORS policy in `Program.cs`
+- [x] Allow frontend origin in development
+- [x] Allow `https://spoolarr.local` in production
 
 </details>
 
