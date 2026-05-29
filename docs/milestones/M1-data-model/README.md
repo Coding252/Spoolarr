@@ -19,86 +19,86 @@ By the end of this milestone the database has four tables — `Spools`, `Printer
 ## Tasks
 
 ### Models
-- [ ] Create `Spool` entity class inside `src/back-end/Domain/Models/`
-- [ ] Create `Printer` entity class inside `src/back-end/Domain/Models/`
-- [ ] Create `PrintJob` entity class inside `src/back-end/Domain/Models/`
-- [ ] Create `NfcTag` entity class inside `src/back-end/Domain/Models/`
+- [x] Create `Spool` entity class inside `src/back-end/Domain/Models/`
+- [x] Create `Printer` entity class inside `src/back-end/Domain/Models/`
+- [x] Create `PrintJob` entity class inside `src/back-end/Domain/Models/`
+- [x] Create `NfcTag` entity class inside `src/back-end/Domain/Models/`
 
 ### Spool fields
-- [ ] `Id` — Guid, primary key
-- [ ] `Brand` — string
-- [ ] `Material` — string
-- [ ] `ColorName` — string
-- [ ] `ColorHex` — string
-- [ ] `InitialWeightG` — float
-- [ ] `CurrentWeightG` — float
-- [ ] `SpoolWeightG` — float, default 200
-- [ ] `DiameterMm` — float, default 1.75
-- [ ] `LowStockThresholdG` — float, default 100
-- [ ] `IsActive` — bool, default false
-- [ ] `IsArchived` — bool, default false
-- [ ] `CreatedAt` — DateTime
-- [ ] `LastScannedAt` — DateTime, nullable
-- [ ] `Notes` — string, nullable
-- [ ] `NfcTags` — navigation property to `NfcTag` (one spool can have one or more tags)
-- [ ] `PrintJobs` — navigation property to `PrintJob`
+- [x] `Id` — Guid, primary key
+- [x] `Brand` — string
+- [x] `Material` — string
+- [x] `ColorName` — string
+- [x] `ColorHex` — string
+- [x] `InitialWeightG` — float
+- [x] `CurrentWeightG` — float
+- [x] `SpoolWeightG` — float, default 200
+- [x] `DiameterMm` — float, default 1.75
+- [x] `LowStockThresholdG` — float, default 100
+- [x] `IsActive` — bool, default false
+- [x] `IsArchived` — bool, default false
+- [x] `CreatedAt` — DateTime
+- [x] `LastScannedAt` — DateTime, nullable
+- [x] `Notes` — string, nullable
+- [x] `NfcTags` — navigation property to `NfcTag` (one spool can have one or more tags)
+- [x] `PrintJobs` — navigation property to `PrintJob`
 
 ### Printer fields
-- [ ] `Id` — Guid, primary key
-- [ ] `Name` — string, user label (e.g. "Garage X1C")
-- [ ] `Brand` — string (e.g. "Bambu Lab", "Prusa", "Voron")
-- [ ] `Model` — string (e.g. "X1 Carbon", "MK4", "P1S")
-- [ ] `SerialNumber` — string, nullable
-- [ ] `IpAddress` — string
-- [ ] `Protocol` — string (values: `"bambu-mqtt"`, `"moonraker"`, `"prusalink"`, `"octoprint"`)
-- [ ] `AccessCode` — string, nullable (Bambu LAN access code or equivalent)
-- [ ] `Port` — int, nullable
-- [ ] `HasAms` — bool, default false
-- [ ] `AmsSlotCount` — int, default 0
-- [ ] `IsActive` — bool, default true
-- [ ] `LastSeenAt` — DateTime, nullable
-- [ ] `CreatedAt` — DateTime
-- [ ] `Notes` — string, nullable
-- [ ] `PrintJobs` — navigation property to `PrintJob`
+- [x] `Id` — Guid, primary key
+- [x] `Name` — string, user label (e.g. "Garage X1C")
+- [x] `Brand` — string (e.g. "Bambu Lab", "Prusa", "Voron")
+- [x] `Model` — string (e.g. "X1 Carbon", "MK4", "P1S")
+- [x] `SerialNumber` — string, nullable
+- [x] `IpAddress` — string
+- [x] `Protocol` — string (values: `"bambu-mqtt"`, `"moonraker"`, `"prusalink"`, `"octoprint"`)
+- [x] `AccessCode` — string, nullable (Bambu LAN access code or equivalent)
+- [x] `Port` — int, nullable
+- [x] `HasAms` — bool, default false
+- [x] `AmsSlotCount` — int, default 0
+- [x] `IsActive` — bool, default true
+- [x] `LastSeenAt` — DateTime, nullable
+- [x] `CreatedAt` — DateTime
+- [x] `Notes` — string, nullable
+- [x] `PrintJobs` — navigation property to `PrintJob`
 
 ### PrintJob fields
-- [ ] `Id` — Guid, primary key
-- [ ] `PrinterId` — Guid, foreign key to `Printer`
-- [ ] `SpoolId` — Guid, foreign key to `Spool`
-- [ ] `PrintFileName` — string, nullable
-- [ ] `Status` — string (values: `"running"`, `"completed"`, `"failed"`, `"interrupted"`)
-- [ ] `GramsUsed` — float, default 0
-- [ ] `LastReportedGramsUsed` — float, default 0
-- [ ] `StartedAt` — DateTime
-- [ ] `FinishedAt` — DateTime, nullable
-- [ ] `LastUpdatedAt` — DateTime
-- [ ] `Source` — string, default `"mqtt"` (values: `"mqtt"`, `"manual"`)
-- [ ] `Notes` — string, nullable
-- [ ] `Printer` — navigation property to `Printer`
-- [ ] `Spool` — navigation property to `Spool`
+- [x] `Id` — Guid, primary key
+- [x] `PrinterId` — Guid, foreign key to `Printer`
+- [x] `SpoolId` — Guid, foreign key to `Spool`
+- [x] `PrintFileName` — string, nullable
+- [x] `Status` — string (values: `"running"`, `"completed"`, `"failed"`, `"interrupted"`)
+- [x] `GramsUsed` — float, default 0
+- [x] `LastReportedGramsUsed` — float, default 0
+- [x] `StartedAt` — DateTime
+- [x] `FinishedAt` — DateTime, nullable
+- [x] `LastUpdatedAt` — DateTime
+- [x] `Source` — string, default `"mqtt"` (values: `"mqtt"`, `"manual"`)
+- [x] `Notes` — string, nullable
+- [x] `Printer` — navigation property to `Printer`
+- [x] `Spool` — navigation property to `Spool`
 
 ### NfcTag fields
-- [ ] `Id` — Guid, primary key
-- [ ] `TagUid` — string, unique (physical NFC tag UID, e.g. "04:A1:B2:C3")
-- [ ] `Type` — string (values: `"ntag215"`, `"bambu"`, `"openprinttag"`, `"opentag3d"`)
-- [ ] `SpoolId` — Guid, foreign key to `Spool`
-- [ ] `CreatedAt` — DateTime
-- [ ] `Spool` — navigation property to `Spool`
+- [x] `Id` — Guid, primary key
+- [x] `TagUid` — string, unique (physical NFC tag UID, e.g. "04:A1:B2:C3")
+- [x] `Type` — string (values: `"ntag215"`, `"bambu"`, `"openprinttag"`, `"opentag3d"`)
+- [x] `SpoolId` — Guid, foreign key to `Spool`
+- [x] `CreatedAt` — DateTime
+- [x] `Spool` — navigation property to `Spool`
 
 > NFC tags are read-only in Spoolarr — the app never writes to them.
 
 ### Database context
-- [ ] Add `DbSet<Spool>` to `FilamentDbContext`
-- [ ] Add `DbSet<Printer>` to `FilamentDbContext`
-- [ ] Add `DbSet<PrintJob>` to `FilamentDbContext`
-- [ ] Add `DbSet<NfcTag>` to `FilamentDbContext`
-- [ ] Configure unique index on `NfcTag.TagUid`
-- [ ] Configure foreign key relationship between `NfcTag` and `Spool`
-- [ ] Configure foreign key relationship between `PrintJob` and `Spool`
-- [ ] Configure foreign key relationship between `PrintJob` and `Printer`
-- [ ] Configure cascade delete — deleting a spool deletes its NFC tags
-- [ ] Configure cascade delete — deleting a spool deletes its print jobs
-- [ ] Configure cascade delete — deleting a printer deletes its print jobs
+- [x] Add `DbSet<Spool>` to `FilamentDbContext`
+- [x] Add `DbSet<Printer>` to `FilamentDbContext`
+- [x] Add `DbSet<PrintJob>` to `FilamentDbContext`
+- [x] Add `DbSet<NfcTag>` to `FilamentDbContext`
+- [x] Configure unique index on `NfcTag.TagUid`
+- [x] Configure foreign key relationship between `NfcTag` and `Spool`
+- [x] Configure foreign key relationship between `PrintJob` and `Spool`
+- [x] Configure foreign key relationship between `PrintJob` and `Printer`
+- [x] Configure cascade delete — deleting a spool deletes its NFC tags
+- [x] Configure cascade delete — deleting a spool deletes its print jobs
+- [x] Configure cascade delete — deleting a printer deletes its print jobs
 
 ### Migrations
 - [ ] Run `dotnet ef migrations add InitialCreate` — run from the `Infrastructure` project
