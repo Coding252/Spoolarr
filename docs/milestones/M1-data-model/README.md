@@ -151,13 +151,13 @@ By the end of this milestone the database has four tables — `Spools`, `Printer
 - [x] Register `INfcTagRepository` → `NfcTagRepository` in `Program.cs`
 
 ### Seed data
-- [ ] Create `SeedData` class inside `src/back-end/Infrastructure/Data/`
-- [ ] Add at least 2 test spools with different materials and colors
-- [ ] Add 1 test NFC tag linked to one of the test spools
-- [ ] Add 1 test printer with placeholder values
-- [ ] Call `SeedData` on app startup only if the database is empty
-- [ ] Run migrations automatically on app startup
-- [ ] Handle the case where the database file already exists — do not re-seed
+- [x] Create `SeedData` class inside `src/back-end/Infrastructure/Data/`
+- [x] Add at least 2 test spools with different materials and colors
+- [x] Add 1 test NFC tag linked to one of the test spools
+- [x] Add 1 test printer with placeholder values
+- [x] Call `SeedData` on app startup only if the database is empty
+- [x] Run migrations automatically on app startup
+- [x] Handle the case where the database file already exists — do not re-seed
 
 ### Error handling
 - [ ] Wrap migration on startup in try/catch — log error and continue if migration fails
