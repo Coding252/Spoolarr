@@ -31,6 +31,7 @@ builder.Services.AddScoped<IPrinterRepository, PrinterRepository>();
 builder.Services.AddScoped<IPrintJobRepository, PrintJobRepository>();
 builder.Services.AddScoped<INfcTagRepository, NfcTagRepository>();
 builder.Services.AddScoped<ISpoolService, SpoolService>();
+builder.Services.AddScoped<INfcScanService, NfcScanService>();
 
 var app = builder.Build();
 
