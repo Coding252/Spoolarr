@@ -11,7 +11,7 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 | [M0 — Project Bootstrap](#milestone-0--project-bootstrap) | Solution, EF Core, health check | ✅ Done |
 | [M1 — Data Model](#milestone-1--data-model) | Entities, migrations, repositories, seed data | ✅ Done |
 | [M2 — Spool API](#milestone-2--spool-api) | REST endpoints for spool management | ✅ Done |
-| [M3 — NFC Scan Flow](#milestone-3--nfc-scan-flow) | Scan endpoint, NfcScanService, SignalR | ⬜ Not started |
+| [M3 — NFC Scan Flow](#milestone-3--nfc-scan-flow) | Scan endpoint, NfcScanService, SignalR | 🔄 In progress |
 | [M4 — Bambu MQTT](#milestone-4--bambu-mqtt) | MQTT listener, print-finish, gram deduction | ⬜ Not started |
 | [M5 — Web UI](#milestone-5--web-ui) | Dashboard, scan page, Web NFC, QR fallback | ⬜ Not started |
 | [M6 — Alerts](#milestone-6--alerts) | Low stock threshold, ntfy / webhook | ⬜ Not started |
