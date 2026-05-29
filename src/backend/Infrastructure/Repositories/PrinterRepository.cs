@@ -1,3 +1,4 @@
+using Application.Interfaces;
 using Domain.Models;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
