@@ -101,9 +101,9 @@ By the end of this milestone the database has four tables — `Spools`, `Printer
 - [x] Configure cascade delete — deleting a printer deletes its print jobs
 
 ### Migrations
-- [ ] Run `dotnet ef migrations add InitialCreate` — run from the `Infrastructure` project
-- [ ] Run `dotnet ef database update` — run from the `Infrastructure` project
-- [ ] Confirm `Spools`, `Printers`, `PrintJobs`, and `NfcTags` tables are created in the SQLite file
+- [x] Run `dotnet ef migrations add InitialCreate` — run from the `Infrastructure` project
+- [x] Run `dotnet ef database update` — run from the `Infrastructure` project
+- [x] Confirm `Spools`, `Printers`, `PrintJobs`, and `NfcTags` tables are created in the SQLite file
 
 ### Spool repository
 - [ ] Create `ISpoolRepository` interface inside `src/back-end/Infrastructure/Repositories/`

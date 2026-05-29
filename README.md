@@ -27,7 +27,7 @@ No subscriptions. No cloud. No vendor lock-in. Runs entirely on your local netwo
 
 | Layer | Project | Technology |
 |---|---|---|
-| Entry point | `API` | C# · ASP.NET Core · .NET 8 |
+| Entry point | `API` | C# · ASP.NET Core · .NET 10 |
 | Business logic | `Application` | C# · interfaces · DTOs |
 | Domain models | `Domain` | Pure C# — no dependencies |
 | Data & external | `Infrastructure` | EF Core · MQTTnet · SQLite |
@@ -192,8 +192,8 @@ Each milestone has its own detailed README with tasks and definition of done.
 
 | Milestone | Description | Status |
 |---|---|---|
-| [M0 — Project Bootstrap](docs/milestones/M0%20-%20Project%20Bootstrap/README.md) | Solution setup, EF Core, health endpoint | 🔄 In progress |
-| [M1 — Data Model](docs/milestones/M1-data-model/README.md) | `Spool` + `PrintJob` entities, migrations, repositories, seed data | ⬜ Not started |
+| [M0 — Project Bootstrap](docs/milestones/M0%20-%20Project%20Bootstrap/README.md) | Solution setup, EF Core, health endpoint | ✅ Done |
+| [M1 — Data Model](docs/milestones/M1-data-model/README.md) | `Spool`, `Printer`, `PrintJob`, `NfcTag` entities, migrations, repositories, seed data | 🔄 In progress |
 | [M2 — Spool API](docs/milestones/M2-spool-api/README.md) | REST endpoints for spool management | ⬜ Not started |
 | [M3 — NFC Scan Flow](docs/milestones/M3-nfc-scan/README.md) | Scan endpoint, `NfcScanService`, SignalR real-time push | ⬜ Not started |
 | [M4 — Bambu MQTT](docs/milestones/M4-bambu-mqtt/README.md) | MQTT listener, print-finish event, auto gram deduction | ⬜ Not started |
@@ -263,61 +263,115 @@ Each milestone has its own detailed README with tasks and definition of done.
 <summary>Milestone 1 — Data Model</summary>
 
 #### Models
-- [ ] Create `Spool` entity class inside `Domain/Models/`
-- [ ] Create `PrintJob` entity class inside `Domain/Models/`
+- [x] Create `Spool` entity class inside `Domain/Models/`
+- [x] Create `Printer` entity class inside `Domain/Models/`
+- [x] Create `PrintJob` entity class inside `Domain/Models/`
+- [x] Create `NfcTag` entity class inside `Domain/Models/`
 
 #### Spool fields
-- [ ] `Id` — Guid, primary key
-- [ ] `NfcTagUid` — string, unique
-- [ ] `Brand` — string
-- [ ] `Material` — string
-- [ ] `ColorName` — string
-- [ ] `ColorHex` — string
-- [ ] `InitialWeightG` — float
-- [ ] `CurrentWeightG` — float
-- [ ] `LowStockThresholdG` — float, default 100g
-- [ ] `IsActive` — bool, default false
-- [ ] `CreatedAt` — DateTime
-- [ ] `LastScannedAt` — DateTime, nullable
-- [ ] `Notes` — string, nullable
-- [ ] `PrintJobs` — navigation property to `PrintJob`
+- [x] `Id` — Guid, primary key
+- [x] `Brand` — string
+- [x] `Material` — string
+- [x] `ColorName` — string
+- [x] `ColorHex` — string
+- [x] `InitialWeightG` — float
+- [x] `CurrentWeightG` — float
+- [x] `SpoolWeightG` — float, default 200
+- [x] `DiameterMm` — float, default 1.75
+- [x] `LowStockThresholdG` — float, default 100
+- [x] `IsActive` — bool, default false
+- [x] `IsArchived` — bool, default false
+- [x] `CreatedAt` — DateTime
+- [x] `LastScannedAt` — DateTime, nullable
+- [x] `Notes` — string, nullable
+- [x] `NfcTags` — navigation property to `NfcTag`
+- [x] `PrintJobs` — navigation property to `PrintJob`
+
+#### Printer fields
+- [x] `Id` — Guid, primary key
+- [x] `Name` — string
+- [x] `Brand` — string
+- [x] `Model` — string
+- [x] `SerialNumber` — string, nullable
+- [x] `IpAddress` — string
+- [x] `Protocol` — string
+- [x] `AccessCode` — string, nullable
+- [x] `Port` — int, nullable
+- [x] `HasAms` — bool, default false
+- [x] `AmsSlotCount` — int, default 0
+- [x] `IsActive` — bool, default true
+- [x] `LastSeenAt` — DateTime, nullable
+- [x] `CreatedAt` — DateTime
+- [x] `Notes` — string, nullable
+- [x] `PrintJobs` — navigation property to `PrintJob`
 
 #### PrintJob fields
-- [ ] `Id` — Guid, primary key
-- [ ] `SpoolId` — Guid, foreign key to `Spool`
-- [ ] `GramsUsed` — float
-- [ ] `PrintName` — string, nullable
-- [ ] `PrintedAt` — DateTime
-- [ ] `Source` — string, default `"mqtt"`
-- [ ] `Spool` — navigation property to `Spool`
+- [x] `Id` — Guid, primary key
+- [x] `PrinterId` — Guid, foreign key to `Printer`
+- [x] `SpoolId` — Guid, foreign key to `Spool`
+- [x] `PrintFileName` — string, nullable
+- [x] `Status` — string
+- [x] `GramsUsed` — float, default 0
+- [x] `LastReportedGramsUsed` — float, default 0
+- [x] `StartedAt` — DateTime
+- [x] `FinishedAt` — DateTime, nullable
+- [x] `LastUpdatedAt` — DateTime
+- [x] `Source` — string, default `"mqtt"`
+- [x] `Notes` — string, nullable
+- [x] `Printer` — navigation property to `Printer`
+- [x] `Spool` — navigation property to `Spool`
+
+#### NfcTag fields
+- [x] `Id` — Guid, primary key
+- [x] `TagUid` — string, unique
+- [x] `Type` — string
+- [x] `SpoolId` — Guid, foreign key to `Spool`
+- [x] `CreatedAt` — DateTime
+- [x] `Spool` — navigation property to `Spool`
 
 #### Database context
-- [ ] Add `DbSet<Spool>` to `FilamentDbContext`
-- [ ] Add `DbSet<PrintJob>` to `FilamentDbContext`
-- [ ] Configure unique index on `Spool.NfcTagUid`
-- [ ] Configure cascade delete
-- [ ] Configure foreign key relationship between `PrintJob` and `Spool`
+- [x] Add `DbSet<Spool>` to `FilamentDbContext`
+- [x] Add `DbSet<Printer>` to `FilamentDbContext`
+- [x] Add `DbSet<PrintJob>` to `FilamentDbContext`
+- [x] Add `DbSet<NfcTag>` to `FilamentDbContext`
+- [x] Configure unique index on `NfcTag.TagUid`
+- [x] Configure cascade delete — spool deletes NFC tags and print jobs
+- [x] Configure cascade delete — printer deletes print jobs
+- [x] Configure foreign key relationships
 
 #### Migrations
-- [ ] Run `dotnet ef migrations add InitialCreate`
-- [ ] Run `dotnet ef database update`
-- [ ] Confirm `Spools` and `PrintJobs` tables are created
+- [x] Run `dotnet ef migrations add InitialCreate`
+- [x] Run `dotnet ef database update`
+- [x] Confirm `Spools`, `Printers`, `PrintJobs`, and `NfcTags` tables are created
 
-#### Repositories
-- [ ] Create `ISpoolRepository` interface in `Infrastructure/Repositories/`
-- [ ] Create `SpoolRepository` implementing `ISpoolRepository`
-- [ ] Add `GetAllAsync`, `GetByIdAsync`, `GetByNfcTagUidAsync`, `GetActiveAsync`
-- [ ] Add `CreateAsync`, `UpdateAsync`, `DeleteAsync`
-- [ ] Create `IPrintJobRepository` interface in `Infrastructure/Repositories/`
-- [ ] Create `PrintJobRepository` implementing `IPrintJobRepository`
-- [ ] Add `GetBySpoolIdAsync`, `CreateAsync`
-- [ ] Register both repositories in `Program.cs`
+#### Spool repository
+- [ ] Create `ISpoolRepository` and `SpoolRepository` in `Infrastructure/Repositories/`
+- [ ] Add `GetAllAsync`, `GetByIdAsync`, `GetActiveAsync`, `CreateAsync`, `UpdateAsync`, `ArchiveAsync`, `DeleteAsync`
+
+#### Printer repository
+- [ ] Create `IPrinterRepository` and `PrinterRepository` in `Infrastructure/Repositories/`
+- [ ] Add `GetAllAsync`, `GetByIdAsync`, `GetActiveAsync`, `CreateAsync`, `UpdateAsync`, `DeleteAsync`
+
+#### PrintJob repository
+- [ ] Create `IPrintJobRepository` and `PrintJobRepository` in `Infrastructure/Repositories/`
+- [ ] Add `GetBySpoolIdAsync`, `GetByPrinterIdAsync`, `GetRunningAsync`, `GetByIdAsync`, `CreateAsync`, `UpdateAsync`
+
+#### NfcTag repository
+- [ ] Create `INfcTagRepository` and `NfcTagRepository` in `Infrastructure/Repositories/`
+- [ ] Add `GetByTagUidAsync`, `GetBySpoolIdAsync`, `CreateAsync`, `DeleteAsync`
+
+#### Dependency injection
+- [ ] Register all 4 repositories in `Program.cs`
 
 #### Seed data
 - [ ] Create `SeedData` class inside `Infrastructure/Data/`
-- [ ] Add at least 2 test spools with different materials and colors
-- [ ] Call `SeedData` on startup only if the database is empty
+- [ ] Add 2 test spools, 1 NFC tag, 1 printer
+- [ ] Call on startup only if database is empty
 - [ ] Run migrations automatically on startup
+
+#### Error handling
+- [ ] Wrap migration in try/catch on startup
+- [ ] Log error if database file cannot be created or accessed
 
 </details>
 
