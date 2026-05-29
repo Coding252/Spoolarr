@@ -1,12 +1,12 @@
 # Milestone 4 — Bambu Lab MQTT Integration
 
-> Connect to the Bambu Lab printer on the local network via MQTT, listen for print-finish events, extract grams used, and automatically deduct from the active spool.
+> Connect to the Bambu Lab printer on the local network via MQTT, listen for print-finish events, extract grams used, automatically deduct from the active spool, and stream live printer status to the browser via SignalR.
 
 ---
 
 ## Goal
 
-By the end of this milestone finishing a print on your Bambu printer automatically deducts the correct grams from the active spool and logs the print job to the database — no manual input required.
+By the end of this milestone finishing a print on your Bambu printer automatically deducts the correct grams from the active spool and logs the print job to the database — no manual input required. Live printer status (state, progress, temperatures) is also pushed to the browser in real time via SignalR.
 
 ---
 
@@ -73,6 +73,33 @@ The following are already in place:
 - [ ] Add `StopAsync` — disconnect MQTT client cleanly
 - [ ] Register `MqttListenerService` as hosted service in `Program.cs`
 
+### Live printer status (M4-S4)
+- [ ] Create `PrinterStatus` record inside `src/backend/Application/DTOs/`
+  - `GcodeState` — string (`IDLE`, `RUNNING`, `PAUSE`, `FINISH`, `FAILED`)
+  - `ProgressPercent` — int (0–100)
+  - `RemainingMinutes` — int
+  - `SubtaskName` — string, nullable
+  - `LayerNum` — int
+  - `TotalLayerNum` — int
+  - `NozzleTempC` — float
+  - `BedTempC` — float
+  - `UpdatedAt` — DateTime (UTC)
+- [ ] Create `IPrinterStatusService` interface inside `src/backend/Application/Interfaces/`
+  - `GetStatus()` — returns current `PrinterStatus?` (in-memory, no DB)
+  - `UpdateStatus(PrinterStatus status)` — called by MQTT listener on every message
+- [ ] Create `PrinterStatusService` inside `src/backend/Application/Services/` implementing `IPrinterStatusService`
+  - Store status as a private field — no DB write, in-memory only
+  - Register as singleton in `Program.cs`
+- [ ] Create `PrinterHub` class inside `src/backend/API/Hubs/`
+- [ ] Register and map `PrinterHub` to `/hubs/printer` in `Program.cs`
+- [ ] Inject `IPrinterStatusService` and `IHubContext<PrinterHub>` into `MqttListenerService`
+- [ ] In `OnMessageReceivedAsync` — parse status fields from every message regardless of `gcode_state`
+- [ ] Call `IPrinterStatusService.UpdateStatus(...)` with parsed values
+- [ ] Push `PrinterStatus` to all SignalR clients via `PrinterHub` — event name `PrinterStatus`
+- [ ] Add `GET /api/printers/status` endpoint in a new `PrinterController`
+  - Return current `PrinterStatus` from `IPrinterStatusService.GetStatus()`
+  - Return `204 No Content` if no status received yet
+
 ### Retry and resilience
 - [ ] If printer is offline at startup — log warning and keep retrying, do not crash
 - [ ] Add reconnect loop — attempt to reconnect every 30 seconds if connection drops
@@ -117,6 +144,34 @@ The following are already in place:
 | `print.filament_weight` | Grams used in the print (float) |
 | `print.subtask_name` | Print file name, used as `PrintJob.PrintFileName` |
 
+### Live status payload (all messages)
+
+```json
+{
+  "print": {
+    "gcode_state": "RUNNING",
+    "mc_percent": 42,
+    "mc_remaining_time": 37,
+    "subtask_name": "benchy.gcode",
+    "layer_num": 85,
+    "total_layer_num": 200,
+    "nozzle_temper": 220.0,
+    "bed_temper": 65.0
+  }
+}
+```
+
+| Field | Maps to |
+|---|---|
+| `print.gcode_state` | `PrinterStatus.GcodeState` |
+| `print.mc_percent` | `PrinterStatus.ProgressPercent` |
+| `print.mc_remaining_time` | `PrinterStatus.RemainingMinutes` |
+| `print.subtask_name` | `PrinterStatus.SubtaskName` |
+| `print.layer_num` | `PrinterStatus.LayerNum` |
+| `print.total_layer_num` | `PrinterStatus.TotalLayerNum` |
+| `print.nozzle_temper` | `PrinterStatus.NozzleTempC` |
+| `print.bed_temper` | `PrinterStatus.BedTempC` |
+
 ---
 
 ## Definition of Done
@@ -131,3 +186,6 @@ The following are already in place:
 - [ ] Service disconnects cleanly when API shuts down
 - [ ] Service retries connection when printer is offline at startup
 - [ ] Service reconnects automatically if connection drops mid-session
+- [ ] `GET /api/printers/status` returns current printer state
+- [ ] `PrinterStatus` SignalR event fires on every MQTT message
+- [ ] Browser receives live state, progress, and temperature updates
