@@ -145,10 +145,10 @@ By the end of this milestone the database has four tables — `Spools`, `Printer
 - [x] Add `DeleteAsync` — delete NFC tag by ID
 
 ### Dependency injection
-- [ ] Register `ISpoolRepository` → `SpoolRepository` in `Program.cs`
-- [ ] Register `IPrinterRepository` → `PrinterRepository` in `Program.cs`
-- [ ] Register `IPrintJobRepository` → `PrintJobRepository` in `Program.cs`
-- [ ] Register `INfcTagRepository` → `NfcTagRepository` in `Program.cs`
+- [x] Register `ISpoolRepository` → `SpoolRepository` in `Program.cs`
+- [x] Register `IPrinterRepository` → `PrinterRepository` in `Program.cs`
+- [x] Register `IPrintJobRepository` → `PrintJobRepository` in `Program.cs`
+- [x] Register `INfcTagRepository` → `NfcTagRepository` in `Program.cs`
 
 ### Seed data
 - [ ] Create `SeedData` class inside `src/back-end/Infrastructure/Data/`
