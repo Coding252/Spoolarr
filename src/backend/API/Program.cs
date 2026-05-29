@@ -17,12 +17,14 @@ builder.Services.AddCors(options =>
     options.AddPolicy("DevPolicy", policy =>
         policy.WithOrigins("http://localhost:3000")
               .AllowAnyHeader()
-              .AllowAnyMethod());
+              .AllowAnyMethod()
+              .AllowCredentials());
 
     options.AddPolicy("ProdPolicy", policy =>
         policy.WithOrigins("https://spoolarr.local")
               .AllowAnyHeader()
-              .AllowAnyMethod());
+              .AllowAnyMethod()
+              .AllowCredentials());
 });
 
 builder.Services.AddDbContext<FilamentDbContext>(options =>
