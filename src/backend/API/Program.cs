@@ -3,10 +3,26 @@ using Application.Services;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddOpenApi();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevPolicy", policy =>
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+
+    options.AddPolicy("ProdPolicy", policy =>
+        policy.WithOrigins("https://spoolarr.local")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
 builder.Services.AddDbContext<FilamentDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -36,6 +52,17 @@ using (var scope = app.Services.CreateScope())
     {
         logger.LogError(ex, "An error occurred applying migrations. The application will continue but the database may be out of date.");
     }
+}
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+    app.UseCors("DevPolicy");
+}
+else
+{
+    app.UseCors("ProdPolicy");
 }
 
 app.UseHttpsRedirection();
