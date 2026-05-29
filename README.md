@@ -66,52 +66,44 @@ Spoolarr/
 │   └── backend/
 │       ├── API/                          # Entry point — controllers, hubs, Program.cs
 │       │   ├── Controllers/
-│       │   │   ├── HealthController.cs
-│       │   │   ├── SpoolController.cs
-│       │   │   ├── ScanController.cs
-│       │   │   └── AmsController.cs
-│       │   ├── Hubs/
-│       │   │   └── NfcScanHub.cs
+│       │   │   └── HealthController.cs
+│       │   ├── Hubs/                     # SignalR hubs (M3)
 │       │   ├── appsettings.json
 │       │   ├── appsettings.Development.json
 │       │   └── Program.cs
 │       │
 │       ├── Application/                  # Business logic — services, interfaces, DTOs
-│       │   ├── DTOs/
-│       │   │   └── SpoolDto.cs
-│       │   ├── Interfaces/
-│       │   │   ├── ISpoolService.cs
-│       │   │   └── INfcScanService.cs
-│       │   └── Services/
-│       │       ├── SpoolService.cs
-│       │       ├── NfcScanService.cs
-│       │       └── AlertService.cs
+│       │   ├── DTOs/                     # (M2)
+│       │   ├── Interfaces/               # (M2)
+│       │   └── Services/                 # (M2)
 │       │
 │       ├── Domain/                       # Pure C# models — no dependencies
 │       │   └── Models/
 │       │       ├── Spool.cs
+│       │       ├── Printer.cs
 │       │       ├── PrintJob.cs
-│       │       ├── AmsSlot.cs
-│       │       └── NfcScanResult.cs
+│       │       └── NfcTag.cs
 │       │
 │       ├── Infrastructure/               # EF Core, repositories, MQTT, settings
 │       │   ├── Data/
 │       │   │   ├── FilamentDbContext.cs
+│       │   │   ├── FilamentDbContextFactory.cs
 │       │   │   └── SeedData.cs
+│       │   ├── Migrations/
+│       │   │   └── 20260529_InitialCreate.cs
 │       │   ├── Repositories/
 │       │   │   ├── ISpoolRepository.cs
 │       │   │   ├── SpoolRepository.cs
+│       │   │   ├── IPrinterRepository.cs
+│       │   │   ├── PrinterRepository.cs
 │       │   │   ├── IPrintJobRepository.cs
 │       │   │   ├── PrintJobRepository.cs
-│       │   │   ├── IAmsSlotRepository.cs
-│       │   │   └── AmsSlotRepository.cs
-│       │   ├── Services/
-│       │   │   └── MqttListenerService.cs
-│       │   └── Settings/
-│       │       ├── BambuMqttSettings.cs
-│       │       └── AlertSettings.cs
+│       │   │   ├── INfcTagRepository.cs
+│       │   │   └── NfcTagRepository.cs
+│       │   ├── Services/                 # (M4 — MQTT listener)
+│       │   └── Settings/                 # (M4 — Bambu settings)
 │       │
-│       ├── Test/                         # Unit tests
+│       ├── Test/                         # xUnit tests
 │       │   └── Services/
 │       │
 │       └── backend.sln
@@ -121,17 +113,17 @@ Spoolarr/
 │   ├── Dockerfile.api
 │   └── Caddyfile
 ├── docs/
-│   ├── ROADMAP.md
-│   ├── spoolarr-nfc-scan-flow.html
+│   ├── README.md
 │   └── milestones/
-│       ├── M0-bootstrap/
+│       ├── M0 - Project Bootstrap/
 │       ├── M1-data-model/
 │       ├── M2-spool-api/
 │       ├── M3-nfc-scan/
 │       ├── M4-bambu-mqtt/
 │       ├── M5-web-ui/
 │       ├── M6-alerts/
-│       └── M7-ams/
+│       ├── M7-ams/
+│       └── M8-docker/
 ├── .gitignore
 └── README.md
 ```
@@ -193,7 +185,7 @@ Each milestone has its own detailed README with tasks and definition of done.
 | Milestone | Description | Status |
 |---|---|---|
 | [M0 — Project Bootstrap](docs/milestones/M0%20-%20Project%20Bootstrap/README.md) | Solution setup, EF Core, health endpoint | ✅ Done |
-| [M1 — Data Model](docs/milestones/M1-data-model/README.md) | `Spool`, `Printer`, `PrintJob`, `NfcTag` entities, migrations, repositories, seed data | 🔄 In progress |
+| [M1 — Data Model](docs/milestones/M1-data-model/README.md) | `Spool`, `Printer`, `PrintJob`, `NfcTag` entities, migrations, repositories, seed data | ✅ Done |
 | [M2 — Spool API](docs/milestones/M2-spool-api/README.md) | REST endpoints for spool management | ⬜ Not started |
 | [M3 — NFC Scan Flow](docs/milestones/M3-nfc-scan/README.md) | Scan endpoint, `NfcScanService`, SignalR real-time push | ⬜ Not started |
 | [M4 — Bambu MQTT](docs/milestones/M4-bambu-mqtt/README.md) | MQTT listener, print-finish event, auto gram deduction | ⬜ Not started |
@@ -208,54 +200,54 @@ Each milestone has its own detailed README with tasks and definition of done.
 <summary>Milestone 0 — Project Bootstrap</summary>
 
 #### Solution setup
-- [ ] Create the solution file `Spoolarr.sln`
-- [ ] Create the `API` ASP.NET Core Web API project inside `src/`
-- [ ] Create the `Application` class library project inside `src/`
-- [ ] Create the `Domain` class library project inside `src/`
-- [ ] Create the `Infrastructure` class library project inside `src/`
-- [ ] Create the `Test` project inside `src/`
-- [ ] Add all 5 projects to `Spoolarr.sln`
+- [x] Create the solution file `Spoolarr.sln`
+- [x] Create the `API` ASP.NET Core Web API project inside `src/`
+- [x] Create the `Application` class library project inside `src/`
+- [x] Create the `Domain` class library project inside `src/`
+- [x] Create the `Infrastructure` class library project inside `src/`
+- [x] Create the `Test` project inside `src/`
+- [x] Add all 5 projects to `Spoolarr.sln`
 
 #### NuGet packages
-- [ ] Install `Microsoft.EntityFrameworkCore` in `Infrastructure`
-- [ ] Install `Microsoft.EntityFrameworkCore.Sqlite` in `Infrastructure`
-- [ ] Install `Microsoft.EntityFrameworkCore.Design` in `Infrastructure`
+- [x] Install `Microsoft.EntityFrameworkCore` in `Infrastructure`
+- [x] Install `Microsoft.EntityFrameworkCore.Sqlite` in `Infrastructure`
+- [x] Install `Microsoft.EntityFrameworkCore.Design` in `Infrastructure`
 
 #### Project structure
-- [ ] Create `Controllers/` folder in `API`
-- [ ] Create `Hubs/` folder in `API`
-- [ ] Create `DTOs/` folder in `Application`
-- [ ] Create `Interfaces/` folder in `Application`
-- [ ] Create `Services/` folder in `Application`
-- [ ] Create `Models/` folder in `Domain`
-- [ ] Create `Data/` folder in `Infrastructure`
-- [ ] Create `Repositories/` folder in `Infrastructure`
-- [ ] Create `Services/` folder in `Infrastructure`
-- [ ] Create `Settings/` folder in `Infrastructure`
+- [x] Create `Controllers/` folder in `API`
+- [x] Create `Hubs/` folder in `API`
+- [x] Create `DTOs/` folder in `Application`
+- [x] Create `Interfaces/` folder in `Application`
+- [x] Create `Services/` folder in `Application`
+- [x] Create `Models/` folder in `Domain`
+- [x] Create `Data/` folder in `Infrastructure`
+- [x] Create `Repositories/` folder in `Infrastructure`
+- [x] Create `Services/` folder in `Infrastructure`
+- [x] Create `Settings/` folder in `Infrastructure`
 
 #### Database
-- [ ] Create `FilamentDbContext` class inside `Infrastructure/Data/`
-- [ ] Add SQLite connection string to `appsettings.json`
-- [ ] Register `FilamentDbContext` in `Program.cs`
+- [x] Create `FilamentDbContext` class inside `Infrastructure/Data/`
+- [x] Add SQLite connection string to `appsettings.json`
+- [x] Register `FilamentDbContext` in `Program.cs`
 
 #### Health check
-- [ ] Create `HealthController` inside `API/Controllers/`
-- [ ] Add `GET /health` endpoint that returns `{ status: "ok", app: "Spoolarr" }`
+- [x] Create `HealthController` inside `API/Controllers/`
+- [x] Add `GET /health` endpoint that returns `{ status: "ok", app: "Spoolarr" }`
 
 #### Docker
-- [ ] Create `docker/` folder at the root of the project
-- [ ] Write `Dockerfile.api` for the API project
-- [ ] Write `docker-compose.yml` with the API service and a persistent volume for SQLite
-- [ ] Write `Caddyfile` for HTTPS reverse proxy
-- [ ] Add Caddy service to `docker-compose.yml`
+- [x] Create `docker/` folder at the root of the project
+- [x] Write `Dockerfile.api` for the API project
+- [x] Write `docker-compose.yml` with the API service and a persistent volume for SQLite
+- [x] Write `Caddyfile` for HTTPS reverse proxy
+- [x] Add Caddy service to `docker-compose.yml`
 
 #### Environment config
-- [ ] Create `appsettings.Development.json` for local dev
-- [ ] Add `ASPNETCORE_ENVIRONMENT` to docker-compose
-- [ ] Make sure SQLite file is stored in the persistent volume `/data/spoolarr.db`
+- [x] Create `appsettings.Development.json` for local dev
+- [x] Add `ASPNETCORE_ENVIRONMENT` to docker-compose
+- [x] Make sure SQLite file is stored in the persistent volume `/data/spoolarr.db`
 
 #### Git
-- [ ] Create `.gitignore` at the root of the project
+- [x] Create `.gitignore` at the root of the project
 
 </details>
 
@@ -345,33 +337,33 @@ Each milestone has its own detailed README with tasks and definition of done.
 - [x] Confirm `Spools`, `Printers`, `PrintJobs`, and `NfcTags` tables are created
 
 #### Spool repository
-- [ ] Create `ISpoolRepository` and `SpoolRepository` in `Infrastructure/Repositories/`
-- [ ] Add `GetAllAsync`, `GetByIdAsync`, `GetActiveAsync`, `CreateAsync`, `UpdateAsync`, `ArchiveAsync`, `DeleteAsync`
+- [x] Create `ISpoolRepository` and `SpoolRepository` in `Infrastructure/Repositories/`
+- [x] Add `GetAllAsync`, `GetByIdAsync`, `GetActiveAsync`, `CreateAsync`, `UpdateAsync`, `ArchiveAsync`, `DeleteAsync`
 
 #### Printer repository
-- [ ] Create `IPrinterRepository` and `PrinterRepository` in `Infrastructure/Repositories/`
-- [ ] Add `GetAllAsync`, `GetByIdAsync`, `GetActiveAsync`, `CreateAsync`, `UpdateAsync`, `DeleteAsync`
+- [x] Create `IPrinterRepository` and `PrinterRepository` in `Infrastructure/Repositories/`
+- [x] Add `GetAllAsync`, `GetByIdAsync`, `GetActiveAsync`, `CreateAsync`, `UpdateAsync`, `DeleteAsync`
 
 #### PrintJob repository
-- [ ] Create `IPrintJobRepository` and `PrintJobRepository` in `Infrastructure/Repositories/`
-- [ ] Add `GetBySpoolIdAsync`, `GetByPrinterIdAsync`, `GetRunningAsync`, `GetByIdAsync`, `CreateAsync`, `UpdateAsync`
+- [x] Create `IPrintJobRepository` and `PrintJobRepository` in `Infrastructure/Repositories/`
+- [x] Add `GetBySpoolIdAsync`, `GetByPrinterIdAsync`, `GetRunningAsync`, `GetByIdAsync`, `CreateAsync`, `UpdateAsync`
 
 #### NfcTag repository
-- [ ] Create `INfcTagRepository` and `NfcTagRepository` in `Infrastructure/Repositories/`
-- [ ] Add `GetByTagUidAsync`, `GetBySpoolIdAsync`, `CreateAsync`, `DeleteAsync`
+- [x] Create `INfcTagRepository` and `NfcTagRepository` in `Infrastructure/Repositories/`
+- [x] Add `GetByTagUidAsync`, `GetBySpoolIdAsync`, `CreateAsync`, `DeleteAsync`
 
 #### Dependency injection
-- [ ] Register all 4 repositories in `Program.cs`
+- [x] Register all 4 repositories in `Program.cs`
 
 #### Seed data
-- [ ] Create `SeedData` class inside `Infrastructure/Data/`
-- [ ] Add 2 test spools, 1 NFC tag, 1 printer
-- [ ] Call on startup only if database is empty
-- [ ] Run migrations automatically on startup
+- [x] Create `SeedData` class inside `Infrastructure/Data/`
+- [x] Add 2 test spools, 1 NFC tag, 1 printer
+- [x] Call on startup only if database is empty
+- [x] Run migrations automatically on startup
 
 #### Error handling
-- [ ] Wrap migration in try/catch on startup
-- [ ] Log error if database file cannot be created or accessed
+- [x] Wrap migration in try/catch on startup
+- [x] Log error if database file cannot be created or accessed
 
 </details>
 
