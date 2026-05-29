@@ -167,12 +167,12 @@ By the end of this milestone the database has four tables — `Spools`, `Printer
 
 ## Definition of Done
 
-- [ ] `Spools`, `Printers`, `PrintJobs`, and `NfcTags` tables exist in the SQLite database
-- [ ] `NfcTag.TagUid` has a unique index
-- [ ] All foreign keys and cascade deletes work correctly
-- [ ] All 4 repositories registered in DI and resolve without errors
-- [ ] Seed data inserts test rows on first run only
-- [ ] `dotnet ef migrations list` shows `InitialCreate` as applied
-- [ ] Inserting a duplicate `TagUid` throws a database constraint error
-- [ ] Deleting a spool also deletes its NFC tags and print jobs
-- [ ] Deleting a printer also deletes its print jobs
+- [x] `Spools`, `Printers`, `PrintJobs`, and `NfcTags` tables exist in the SQLite database
+- [x] `NfcTag.TagUid` has a unique index
+- [x] All foreign keys and cascade deletes work correctly
+- [x] All 4 repositories registered in DI and resolve without errors
+- [x] Seed data inserts test rows on first run only
+- [x] `dotnet ef migrations list` shows `InitialCreate` as applied
+- [x] Inserting a duplicate `TagUid` throws a database constraint error
+- [x] Deleting a spool also deletes its NFC tags and print jobs
+- [x] Deleting a printer also deletes its print jobs
