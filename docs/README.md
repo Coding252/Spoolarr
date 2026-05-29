@@ -101,11 +101,18 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 
 ### Tasks
 
-- [ ] `MqttListenerService` as `IHostedService`
-- [ ] Connect to printer on LAN using MQTTnet
-- [ ] Parse print-finish event, extract grams used
-- [ ] Deduct grams from active spool via `SpoolService`
-- [ ] Log `PrintJob` to DB
+- [ ] Install `MQTTnet` v5 in `Infrastructure`
+- [ ] Create `BambuMqttSettings` in `Infrastructure/Settings/`
+- [ ] Add `BambuMqtt` section to `appsettings.json` and `appsettings.Development.json`
+- [ ] Register settings in `Program.cs`
+- [ ] Create `MqttListenerService` in `Infrastructure/Services/` as `IHostedService`
+- [ ] Connect to printer via TLS using `bblp` credentials
+- [ ] Subscribe to `device/{serial}/report` topic
+- [ ] Parse `print.gcode_state == "FINISH"` and extract `print.filament_weight`
+- [ ] Deduct grams from active spool, floor at 0, save via `ISpoolRepository`
+- [ ] Log `PrintJob` to DB via `IPrintJobRepository`
+- [ ] Retry connection every 30 seconds if offline at startup or connection drops
+- [ ] Register `MqttListenerService` as hosted service in `Program.cs`
 
 ---
 
