@@ -9,8 +9,8 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 | Milestone | Description | Status |
 |---|---|---|
 | [M0 — Project Bootstrap](#milestone-0--project-bootstrap) | Solution, EF Core, health check | ✅ Done |
-| [M1 — Data Model](#milestone-1--data-model) | Entities, migrations, repositories, seed data | 🔄 In progress |
-| [M2 — Spool API](#milestone-2--spool-api) | REST endpoints for spool management | ⬜ Not started |
+| [M1 — Data Model](#milestone-1--data-model) | Entities, migrations, repositories, seed data | ✅ Done |
+| [M2 — Spool API](#milestone-2--spool-api) | REST endpoints for spool management | 🔄 In progress |
 | [M3 — NFC Scan Flow](#milestone-3--nfc-scan-flow) | Scan endpoint, NfcScanService, SignalR | ⬜ Not started |
 | [M4 — Bambu MQTT](#milestone-4--bambu-mqtt) | MQTT listener, print-finish, gram deduction | ⬜ Not started |
 | [M5 — Web UI](#milestone-5--web-ui) | Dashboard, scan page, Web NFC, QR fallback | ⬜ Not started |
@@ -24,7 +24,7 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 
 > Set up the solution structure, Docker skeleton, HTTPS proxy, database connection, and a working health check endpoint.
 
-📄 [Full milestone README](milestones/M0-bootstrap/README.md)
+📄 [Full milestone README](milestones/M0%20-%20Project%20Bootstrap/README.md)
 
 **Depends on:** Nothing — start here.
 
@@ -48,10 +48,12 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 
 ### Tasks
 
-- [ ] `Spool` entity + migration
-- [ ] `PrintJob` entity + migration
-- [ ] `SpoolRepository` + `PrintJobRepository`
-- [ ] Seed data for testing
+- [x] `Spool`, `Printer`, `PrintJob`, `NfcTag` entity classes
+- [x] EF Core migrations — `InitialCreate` applied, all 4 tables created
+- [x] `ISpoolRepository`, `IPrinterRepository`, `IPrintJobRepository`, `INfcTagRepository` + implementations
+- [x] All 4 repositories registered in DI
+- [x] `SeedData` — 2 spools, 1 NFC tag, 1 printer on first run
+- [x] Auto-migration and error handling on startup
 
 ---
 
