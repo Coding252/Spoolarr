@@ -117,14 +117,14 @@ By the end of this milestone the database has four tables — `Spools`, `Printer
 - [x] Add `DeleteAsync` — delete spool by ID
 
 ### Printer repository
-- [ ] Create `IPrinterRepository` interface inside `src/back-end/Infrastructure/Repositories/`
-- [ ] Create `PrinterRepository` class implementing `IPrinterRepository`
-- [ ] Add `GetAllAsync` — return all printers ordered by name
-- [ ] Add `GetByIdAsync` — return printer by ID
-- [ ] Add `GetActiveAsync` — return all printers where `IsActive = true`
-- [ ] Add `CreateAsync` — insert new printer
-- [ ] Add `UpdateAsync` — update existing printer
-- [ ] Add `DeleteAsync` — delete printer by ID
+- [x] Create `IPrinterRepository` interface inside `src/back-end/Infrastructure/Repositories/`
+- [x] Create `PrinterRepository` class implementing `IPrinterRepository`
+- [x] Add `GetAllAsync` — return all printers ordered by name
+- [x] Add `GetByIdAsync` — return printer by ID
+- [x] Add `GetActiveAsync` — return all printers where `IsActive = true`
+- [x] Add `CreateAsync` — insert new printer
+- [x] Add `UpdateAsync` — update existing printer
+- [x] Add `DeleteAsync` — delete printer by ID
 
 ### PrintJob repository
 - [ ] Create `IPrintJobRepository` interface inside `src/back-end/Infrastructure/Repositories/`
