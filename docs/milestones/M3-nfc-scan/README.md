@@ -33,43 +33,43 @@ The following are already in place from Milestone 2:
 ## Tasks
 
 ### DTOs
-- [ ] Create `ScanRequest` record inside `src/backend/Application/DTOs/`
-- [ ] Add `TagUid` field — string, `[Required]`
-- [ ] Create `NfcScanResult` record inside `src/backend/Application/DTOs/`
-- [ ] Add `Status` field — string, values: `"activated"` or `"unknown"`
-- [ ] Add `TagUid` field — string
-- [ ] Add `Spool` field — `SpoolResponse?`, nullable
-- [ ] Add `Message` field — string, nullable
+- [x] Create `ScanRequest` record inside `src/backend/Application/DTOs/`
+- [x] Add `TagUid` field — string, `[Required]`
+- [x] Create `NfcScanResult` record inside `src/backend/Application/DTOs/`
+- [x] Add `Status` field — string, values: `"activated"` or `"unknown"`
+- [x] Add `TagUid` field — string
+- [x] Add `Spool` field — `SpoolResponse?`, nullable
+- [x] Add `Message` field — string, nullable
 
 ### NfcScanService
-- [ ] Create `INfcScanService` interface inside `src/backend/Application/Interfaces/`
-- [ ] Create `NfcScanService` class inside `src/backend/Application/Services/` implementing `INfcScanService`
-- [ ] Add `ProcessScanAsync` — takes tag UID string, returns `NfcScanResult`
-- [ ] If tag UID not found in DB → return `NfcScanResult` with `Status = "unknown"`, null spool
-- [ ] If tag UID found → call `ISpoolService.ActivateAsync`, return `Status = "activated"` with spool data
-- [ ] Register `INfcScanService` → `NfcScanService` as scoped in `Program.cs`
+- [x] Create `INfcScanService` interface inside `src/backend/Application/Interfaces/`
+- [x] Create `NfcScanService` class inside `src/backend/Application/Services/` implementing `INfcScanService`
+- [x] Add `ProcessScanAsync` — takes tag UID string, returns `NfcScanResult`
+- [x] If tag UID not found in DB → return `NfcScanResult` with `Status = "unknown"`, null spool
+- [x] If tag UID found → call `ISpoolService.ActivateAsync`, return `Status = "activated"` with spool data
+- [x] Register `INfcScanService` → `NfcScanService` as scoped in `Program.cs`
 
 ### SignalR hub
-- [ ] Create `NfcScanHub` class inside `src/backend/API/Hubs/`
-- [ ] Register SignalR in `Program.cs` via `builder.Services.AddSignalR()`
-- [ ] Map hub endpoint to `/hubs/nfc` in `Program.cs`
+- [x] Create `NfcScanHub` class inside `src/backend/API/Hubs/`
+- [x] Register SignalR in `Program.cs` via `builder.Services.AddSignalR()`
+- [x] Map hub endpoint to `/hubs/nfc` in `Program.cs`
 
 ### ScanController
-- [ ] Create `ScanController` inside `src/backend/API/Controllers/`
-- [ ] Add `POST /api/spools/scan` endpoint accepting `ScanRequest` body
-- [ ] Validate `TagUid` is not empty — return `400` if missing
-- [ ] Call `INfcScanService.ProcessScanAsync` with the tag UID
-- [ ] Push `NfcScanResult` to all SignalR clients via `IHubContext<NfcScanHub>`
-- [ ] Return `200 OK` with the `NfcScanResult`
+- [x] Create `ScanController` inside `src/backend/API/Controllers/`
+- [x] Add `POST /api/spools/scan` endpoint accepting `ScanRequest` body
+- [x] Validate `TagUid` is not empty — return `400` if missing
+- [x] Call `INfcScanService.ProcessScanAsync` with the tag UID
+- [x] Push `NfcScanResult` to all SignalR clients via `IHubContext<NfcScanHub>`
+- [x] Return `200 OK` with the `NfcScanResult`
 
 ### CORS for SignalR
-- [ ] Add `AllowCredentials()` to CORS policies in `Program.cs` — required for SignalR WebSocket handshake
-- [ ] Explicit origins already set from M2 (`WithOrigins(...)`) — required when using `AllowCredentials()`
+- [x] Add `AllowCredentials()` to CORS policies in `Program.cs` — required for SignalR WebSocket handshake
+- [x] Explicit origins already set from M2 (`WithOrigins(...)`) — required when using `AllowCredentials()`
 
 ### Error handling
-- [ ] Return `400 Bad Request` if `TagUid` is null or empty
-- [ ] Log a warning if scan is received but no tag UID provided
-- [ ] Handle SignalR send failure gracefully — log error but still return HTTP response
+- [x] Return `400 Bad Request` if `TagUid` is null or empty
+- [x] Log a warning if scan is received but no tag UID provided
+- [x] Handle SignalR send failure gracefully — log error but still return HTTP response
 
 ---
 
@@ -101,11 +101,11 @@ The following are already in place from Milestone 2:
 
 ## Definition of Done
 
-- [ ] `POST /api/spools/scan` with known UID activates spool and returns `"activated"`
-- [ ] `POST /api/spools/scan` with unknown UID returns `"unknown"` with null spool
-- [ ] `POST /api/spools/scan` with empty `TagUid` returns `400`
-- [ ] SignalR hub is accessible at `/hubs/nfc`
-- [ ] `ScanResult` SignalR event fires on every scan
-- [ ] Both known and unknown tag scenarios tested with Postman or curl
-- [ ] SignalR `ScanResult` event received in browser console during test
-- [ ] CORS does not block SignalR connection from frontend
+- [x] `POST /api/spools/scan` with known UID activates spool and returns `"activated"`
+- [x] `POST /api/spools/scan` with unknown UID returns `"unknown"` with null spool
+- [x] `POST /api/spools/scan` with empty `TagUid` returns `400`
+- [x] SignalR hub is accessible at `/hubs/nfc`
+- [x] `ScanResult` SignalR event fires on every scan
+- [x] Both known and unknown tag scenarios tested with Postman or curl
+- [x] SignalR `ScanResult` event received in browser console during test
+- [x] CORS does not block SignalR connection from frontend

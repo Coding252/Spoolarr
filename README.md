@@ -187,7 +187,7 @@ Each milestone has its own detailed README with tasks and definition of done.
 | [M0 — Project Bootstrap](docs/milestones/M0%20-%20Project%20Bootstrap/README.md) | Solution setup, EF Core, health endpoint | ✅ Done |
 | [M1 — Data Model](docs/milestones/M1-data-model/README.md) | `Spool`, `Printer`, `PrintJob`, `NfcTag` entities, migrations, repositories, seed data | ✅ Done |
 | [M2 — Spool API](docs/milestones/M2-spool-api/README.md) | REST endpoints for spool management | ✅ Done |
-| [M3 — NFC Scan Flow](docs/milestones/M3-nfc-scan/README.md) | Scan endpoint, `NfcScanService`, SignalR real-time push | 🔄 In progress |
+| [M3 — NFC Scan Flow](docs/milestones/M3-nfc-scan/README.md) | Scan endpoint, `NfcScanService`, SignalR real-time push | ✅ Done |
 | [M4 — Bambu MQTT](docs/milestones/M4-bambu-mqtt/README.md) | MQTT listener, print-finish event, auto gram deduction | ⬜ Not started |
 | [M5 — Web UI](docs/milestones/M5-web-ui/README.md) | Dashboard, scan page, Web NFC, QR fallback, register form | ⬜ Not started |
 | [M6 — Alerts](docs/milestones/M6-alerts/README.md) | Low stock threshold check, ntfy / webhook notifications | ⬜ Not started |
@@ -403,25 +403,27 @@ Each milestone has its own detailed README with tasks and definition of done.
 <details>
 <summary>Milestone 3 — NFC Scan Flow</summary>
 
-#### Models
-- [ ] Create `NfcScanResult` record in `Domain/Models/`
-- [ ] Create `ScanRequest` record in `Domain/Models/`
+#### DTOs
+- [x] Create `ScanRequest` record in `Application/DTOs/`
+- [x] Create `NfcScanResult` record in `Application/DTOs/`
 
 #### NfcScanService
-- [ ] Create `INfcScanService` in `Application/Interfaces/`
-- [ ] Create `NfcScanService` in `Application/Services/`
-- [ ] Return `"activated"` for known tag, `"unknown"` for unregistered tag
-- [ ] Register in `Program.cs`
+- [x] Create `INfcScanService` in `Application/Interfaces/`
+- [x] Create `NfcScanService` in `Application/Services/`
+- [x] Return `"activated"` for known tag, `"unknown"` for unregistered tag
+- [x] Register in `Program.cs`
 
 #### SignalR
-- [ ] Install `Microsoft.AspNetCore.SignalR`
-- [ ] Create `NfcScanHub` in `API/Hubs/`
-- [ ] Register SignalR and map hub to `/hubs/nfc` in `Program.cs`
+- [x] Create `NfcScanHub` in `API/Hubs/`
+- [x] Register SignalR and map hub to `/hubs/nfc` in `Program.cs`
 
 #### ScanController
-- [ ] Create `ScanController` in `API/Controllers/`
-- [ ] Add `POST /api/spools/scan`
-- [ ] Push `ScanResult` to all SignalR clients on every scan
+- [x] Create `ScanController` in `API/Controllers/`
+- [x] Add `POST /api/spools/scan`
+- [x] Push `ScanResult` to all SignalR clients on every scan
+
+#### CORS
+- [x] Add `AllowCredentials()` to CORS policies for SignalR
 
 </details>
 
