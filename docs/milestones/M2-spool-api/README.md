@@ -6,7 +6,7 @@
 
 ## Goal
 
-By the end of this milestone you have a fully working REST API for spool management that can be tested with Postman or curl. No UI yet — just the backend endpoints the frontend will call later.
+By the end of this milestone you have a fully working REST API for spool management that can be tested with Postman, curl, or Swagger UI. No UI yet — just the backend endpoints the frontend will call later.
 
 ---
 
@@ -17,54 +17,97 @@ By the end of this milestone you have a fully working REST API for spool managem
 
 ---
 
+## Context from M1
+
+The following are already in place from Milestone 1:
+
+- `Spool` entity with fields: `Id`, `Brand`, `Material`, `ColorName`, `ColorHex`, `InitialWeightG`, `CurrentWeightG`, `SpoolWeightG`, `DiameterMm`, `LowStockThresholdG`, `IsActive`, `IsArchived`, `CreatedAt`, `LastScannedAt`, `Notes`
+- `NfcTag` is a **separate entity** linked to `Spool` via `SpoolId` foreign key — there is no `NfcTagUid` field on `Spool`
+- `ISpoolRepository` with `GetAllAsync`, `GetByIdAsync`, `GetActiveAsync`, `CreateAsync`, `UpdateAsync`, `ArchiveAsync`, `DeleteAsync`
+- All repositories registered as scoped services in `Program.cs`
+- SQLite database with migrations applied and seed data on first run
+
+---
+
 ## Tasks
 
 ### DTOs
-- [ ] Create `SpoolResponse` record inside `Application/DTOs/` — all spool fields returned to the client
-- [ ] Create `RegisterSpoolRequest` record inside `Application/DTOs/` — fields required to register a new spool
-- [ ] Create `UpdateWeightRequest` record inside `Application/DTOs/` — single `NewWeightG` field
+- [ ] Create `SpoolResponse` record inside `src/backend/Application/DTOs/` — maps all `Spool` entity fields returned to the client
+- [ ] Create `RegisterSpoolRequest` record inside `src/backend/Application/DTOs/` — fields required to register a new spool
+- [ ] Create `UpdateWeightRequest` record inside `src/backend/Application/DTOs/` — single `NewWeightG` field
+
+#### SpoolResponse fields
+- [ ] `Id` — Guid
+- [ ] `Brand` — string
+- [ ] `Material` — string
+- [ ] `ColorName` — string
+- [ ] `ColorHex` — string
+- [ ] `InitialWeightG` — float
+- [ ] `CurrentWeightG` — float
+- [ ] `SpoolWeightG` — float
+- [ ] `DiameterMm` — float
+- [ ] `LowStockThresholdG` — float
+- [ ] `IsActive` — bool
+- [ ] `IsArchived` — bool
+- [ ] `CreatedAt` — DateTime
+- [ ] `LastScannedAt` — DateTime, nullable
+- [ ] `Notes` — string, nullable
+
+#### RegisterSpoolRequest fields
+- [ ] `Brand` — string, required
+- [ ] `Material` — string, required
+- [ ] `ColorName` — string, required
+- [ ] `ColorHex` — string, required
+- [ ] `InitialWeightG` — float, required, must be greater than 0
+- [ ] `SpoolWeightG` — float, optional, default 200
+- [ ] `DiameterMm` — float, optional, default 1.75
+- [ ] `LowStockThresholdG` — float, optional, default 100
+- [ ] `Notes` — string, optional
+
+#### UpdateWeightRequest fields
+- [ ] `NewWeightG` — float, required, must be 0 or greater
 
 ### SpoolService
-- [ ] Create `ISpoolService` interface inside `Application/Interfaces/`
-- [ ] Create `SpoolService` class inside `Application/Services/` implementing `ISpoolService`
-- [ ] Add `GetAllAsync` — return all spools as `SpoolResponse` list
-- [ ] Add `GetByIdAsync` — return single spool as `SpoolResponse` or null
-- [ ] Add `RegisterAsync` — create new spool from `RegisterSpoolRequest`
-- [ ] Add `ActivateAsync` — deactivate current active spool, activate the new one, update `LastScannedAt`
-- [ ] Add `UpdateWeightAsync` — update `CurrentWeightG` on a spool
+- [ ] Create `ISpoolService` interface inside `src/backend/Application/Interfaces/`
+- [ ] Create `SpoolService` class inside `src/backend/Application/Services/` implementing `ISpoolService`
+- [ ] Add `GetAllAsync` — call `ISpoolRepository.GetAllAsync`, map to `SpoolResponse` list
+- [ ] Add `GetByIdAsync` — call `ISpoolRepository.GetByIdAsync`, map to `SpoolResponse` or return null
+- [ ] Add `RegisterAsync` — build `Spool` from `RegisterSpoolRequest`, set `CreatedAt = DateTime.UtcNow`, call `ISpoolRepository.CreateAsync`
+- [ ] Add `ActivateAsync` — deactivate the current active spool via `ISpoolRepository.GetActiveAsync` + `UpdateAsync`, then activate the target spool and set `LastScannedAt = DateTime.UtcNow`
+- [ ] Add `UpdateWeightAsync` — load spool by ID, set `CurrentWeightG = NewWeightG`, call `ISpoolRepository.UpdateAsync`
 - [ ] Add private `ToResponse` helper — map `Spool` entity to `SpoolResponse`
-- [ ] Register `ISpoolService` → `SpoolService` in `Program.cs`
+- [ ] Register `ISpoolService` → `SpoolService` as scoped in `Program.cs`
 
 ### SpoolController
-- [ ] Create `SpoolController` inside `API/Controllers/`
-- [ ] Add `GET /api/spools` — returns list of all spools
-- [ ] Add `GET /api/spools/{id}` — returns single spool or `404`
-- [ ] Add `POST /api/spools` — registers new spool, returns `201 Created` with location header
-- [ ] Add `PATCH /api/spools/{id}/activate` — activates spool, returns updated spool or `404`
-- [ ] Add `PATCH /api/spools/{id}/weight` — updates weight, returns updated spool or `404`
+- [ ] Create `SpoolController` inside `src/backend/API/Controllers/`
+- [ ] Add `GET /api/spools` — returns `200` with list of all spools
+- [ ] Add `GET /api/spools/{id}` — returns `200` with spool or `404 Not Found`
+- [ ] Add `POST /api/spools` — registers new spool, returns `201 Created` with `Location` header
+- [ ] Add `PATCH /api/spools/{id}/activate` — activates spool, returns `200` updated spool or `404`
+- [ ] Add `PATCH /api/spools/{id}/weight` — updates weight, returns `200` updated spool or `404`
 
 ### Validation
-- [ ] `NfcTagUid` is required on register
+- [ ] `Brand` is required on register
 - [ ] `Material` is required on register
+- [ ] `ColorName` is required on register
 - [ ] `InitialWeightG` must be greater than 0
 - [ ] `NewWeightG` must be 0 or greater
-- [ ] Return `400 Bad Request` with message if validation fails
+- [ ] Return `400 Bad Request` with descriptive message if validation fails
 
 ### Swagger / Scalar
-- [ ] Install `Scalar.AspNetCore` or `Swashbuckle.AspNetCore` NuGet package
-- [ ] Register Swagger / Scalar in `Program.cs`
+- [ ] Install `Scalar.AspNetCore` NuGet package in `src/backend/API`
+- [ ] Register Scalar in `Program.cs`
 - [ ] Enable only in `Development` environment
-- [ ] Confirm all 5 endpoints appear and are testable in the browser UI
+- [ ] Confirm all 5 endpoints appear and are testable in the browser UI at `/scalar`
 
 ### CORS
 - [ ] Add CORS policy in `Program.cs`
-- [ ] Allow requests from the frontend origin in development (e.g. `http://localhost:3000`)
+- [ ] Allow requests from `http://localhost:3000` in development
 - [ ] Allow requests from `https://spoolarr.local` in production
 - [ ] Apply CORS middleware before controllers
 
 ### Error handling
 - [ ] Return `404 Not Found` if spool ID does not exist
-- [ ] Return `409 Conflict` if `NfcTagUid` is already registered
 - [ ] Return `400 Bad Request` with descriptive message for invalid request body
 
 ---
@@ -84,8 +127,7 @@ By the end of this milestone you have a fully working REST API for spool managem
 ## Definition of Done
 
 - [ ] All 5 endpoints return correct HTTP status codes
-- [ ] `POST /api/spools` returns `201 Created` with location header
-- [ ] Activating a spool deactivates the previously active one
-- [ ] Duplicate `NfcTagUid` returns `409 Conflict`
+- [ ] `POST /api/spools` returns `201 Created` with `Location` header
+- [ ] Activating a spool deactivates the previously active one and sets `LastScannedAt`
 - [ ] All endpoints tested manually with Postman, curl, or Swagger UI
 - [ ] CORS does not block frontend requests in development
