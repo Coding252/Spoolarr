@@ -18,8 +18,21 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<FilamentDbContext>();
-    db.Database.Migrate();
-    await SeedData.InitialiseAsync(db);
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+    try
+    {
+        db.Database.Migrate();
+        await SeedData.InitialiseAsync(db);
+    }
+    catch (Exception ex) when (ex is InvalidOperationException or IOException)
+    {
+        logger.LogError(ex, "Database file could not be created or accessed. Check the connection string and file permissions.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred applying migrations. The application will continue but the database may be out of date.");
+    }
 }
 
 app.UseHttpsRedirection();
