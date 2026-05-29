@@ -1,3 +1,5 @@
+using Application.Interfaces;
+using Application.Services;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +14,7 @@ builder.Services.AddScoped<ISpoolRepository, SpoolRepository>();
 builder.Services.AddScoped<IPrinterRepository, PrinterRepository>();
 builder.Services.AddScoped<IPrintJobRepository, PrintJobRepository>();
 builder.Services.AddScoped<INfcTagRepository, NfcTagRepository>();
+builder.Services.AddScoped<ISpoolService, SpoolService>();
 
 var app = builder.Build();
 

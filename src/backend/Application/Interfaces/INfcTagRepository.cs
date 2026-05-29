@@ -1,6 +1,6 @@
 using Domain.Models;
 
-namespace Infrastructure.Repositories;
+namespace Application.Interfaces;
 
 public interface INfcTagRepository
 {
