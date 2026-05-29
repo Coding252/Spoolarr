@@ -106,15 +106,15 @@ By the end of this milestone the database has four tables — `Spools`, `Printer
 - [x] Confirm `Spools`, `Printers`, `PrintJobs`, and `NfcTags` tables are created in the SQLite file
 
 ### Spool repository
-- [ ] Create `ISpoolRepository` interface inside `src/back-end/Infrastructure/Repositories/`
-- [ ] Create `SpoolRepository` class implementing `ISpoolRepository`
-- [ ] Add `GetAllAsync` — return all non-archived spools ordered by last scanned
-- [ ] Add `GetByIdAsync` — return spool by ID including NFC tags and print jobs
-- [ ] Add `GetActiveAsync` — return the currently active spool
-- [ ] Add `CreateAsync` — insert new spool
-- [ ] Add `UpdateAsync` — update existing spool
-- [ ] Add `ArchiveAsync` — set `IsArchived = true`
-- [ ] Add `DeleteAsync` — delete spool by ID
+- [x] Create `ISpoolRepository` interface inside `src/back-end/Infrastructure/Repositories/`
+- [x] Create `SpoolRepository` class implementing `ISpoolRepository`
+- [x] Add `GetAllAsync` — return all non-archived spools ordered by last scanned
+- [x] Add `GetByIdAsync` — return spool by ID including NFC tags and print jobs
+- [x] Add `GetActiveAsync` — return the currently active spool
+- [x] Add `CreateAsync` — insert new spool
+- [x] Add `UpdateAsync` — update existing spool
+- [x] Add `ArchiveAsync` — set `IsArchived = true`
+- [x] Add `DeleteAsync` — delete spool by ID
 
 ### Printer repository
 - [ ] Create `IPrinterRepository` interface inside `src/back-end/Infrastructure/Repositories/`
