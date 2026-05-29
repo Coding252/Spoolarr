@@ -18,58 +18,74 @@ By the end of this milestone finishing a print on your Bambu printer automatical
 
 ---
 
+## Context from M1 / M2
+
+The following are already in place:
+
+- `Printer` entity with `IpAddress`, `AccessCode`, `Protocol`, `SerialNumber`, `HasAms`, `AmsSlotCount` fields
+- `PrintJob` entity with `SpoolId`, `PrinterId`, `GramsUsed`, `Status`, `Source`, `StartedAt`, `FinishedAt`
+- `IPrintJobRepository` with `CreateAsync`, `UpdateAsync`
+- `ISpoolRepository` with `GetActiveAsync`, `UpdateAsync`
+- `ISpoolService` with `UpdateWeightAsync` — updates `CurrentWeightG` and persists via repository
+- All repositories registered as scoped services in `Program.cs`
+- `Infrastructure` project already references `Application` — scoped services must be resolved via `IServiceScopeFactory` inside a hosted service
+
+---
+
 ## Tasks
 
 ### NuGet packages
-- [ ] Install `MQTTnet` in `Infrastructure`
-- [ ] Install `MQTTnet.Extensions.ManagedClient` in `Infrastructure`
+- [ ] Install `MQTTnet` version 5.x in `src/backend/Infrastructure`
+  - Note: `MQTTnet.Extensions.ManagedClient` was removed in v5 — do not install it
 
 ### Settings
-- [ ] Create `BambuMqttSettings` class inside `Infrastructure/Settings/`
+- [ ] Create `BambuMqttSettings` class inside `src/backend/Infrastructure/Settings/`
 - [ ] Add `PrinterIp` field — string
 - [ ] Add `Port` field — int, default `8883`
 - [ ] Add `Serial` field — string
 - [ ] Add `AccessCode` field — string
-- [ ] Add `BambuMqtt` section to `appsettings.json` in `API` with placeholder values
-- [ ] Register `BambuMqttSettings` in `Program.cs` via `Configure<BambuMqttSettings>`
+- [ ] Add `BambuMqtt` section to `src/backend/API/appsettings.json` with placeholder values
+- [ ] Add `BambuMqtt` section to `src/backend/API/appsettings.Development.json` with real local values for testing
+- [ ] Register `BambuMqttSettings` in `Program.cs` via `builder.Services.Configure<BambuMqttSettings>(...)`
 
 ### MqttListenerService
-- [ ] Create `MqttListenerService` class inside `Infrastructure/Services/`
+- [ ] Create `MqttListenerService` class inside `src/backend/Infrastructure/Services/`
 - [ ] Implement `IHostedService` interface
-- [ ] Add `StartAsync` — create MQTT client and connect to printer using settings
-- [ ] Configure TLS with certificate validation disabled for LAN use
-- [ ] Subscribe to topic `device/{serial}/report` on connect
+- [ ] Inject `IServiceScopeFactory`, `IOptions<BambuMqttSettings>`, `ILogger<MqttListenerService>`
+- [ ] Add `StartAsync` — create `MqttFactory`, build `IMqttClient`, connect to printer using settings
+- [ ] Configure TLS with `ValidateServerCertificate = false` for LAN use
+- [ ] Set MQTT credentials — username `bblp`, password = `AccessCode`
+- [ ] Subscribe to topic `device/{serial}/report` on successful connect
 - [ ] Add `OnMessageReceivedAsync` — fires on every MQTT message
-- [ ] Parse incoming JSON payload
-- [ ] Check `print.gcode_state` equals `"FINISH"` before processing
-- [ ] Extract `filament_weight` grams from payload
+- [ ] Parse incoming JSON payload with `System.Text.Json`
+- [ ] Check `print.gcode_state` equals `"FINISH"` before processing — skip all other states
+- [ ] Extract `print.filament_weight` (grams, float) from payload
 - [ ] Skip message if grams is 0 or missing
-- [ ] Call `DeductFromActiveSpoolAsync` with extracted grams
-- [ ] Add `DeductFromActiveSpoolAsync` — deduct grams from active spool
-- [ ] Use `IServiceScopeFactory` to resolve scoped services inside hosted service
-- [ ] Get active spool from `ISpoolRepository`
-- [ ] Log warning and skip if no active spool is set
-- [ ] Subtract grams from `CurrentWeightG`, floor at 0
-- [ ] Save updated spool via `ISpoolRepository`
-- [ ] Create new `PrintJob` record with grams used, spool ID, source `"mqtt"`
-- [ ] Save print job via `IPrintJobRepository`
-- [ ] Log successful deduction with grams and remaining weight
+- [ ] Call `DeductFromActiveSpoolAsync` with extracted grams and print file name
+- [ ] Add `DeductFromActiveSpoolAsync` — deduct grams and log print job
+- [ ] Use `IServiceScopeFactory` to create a scope and resolve `ISpoolRepository`, `IPrintJobRepository`
+- [ ] Get active spool via `ISpoolRepository.GetActiveAsync`
+- [ ] Log warning and return if no active spool is set
+- [ ] Subtract grams from `CurrentWeightG`, floor at 0, save via `ISpoolRepository.UpdateAsync`
+- [ ] Create `PrintJob` record — set `SpoolId`, `GramsUsed`, `Status = "finished"`, `Source = "mqtt"`, `StartedAt = FinishedAt = UtcNow`
+- [ ] Save print job via `IPrintJobRepository.CreateAsync`
+- [ ] Log successful deduction with grams used and remaining weight
 - [ ] Add `StopAsync` — disconnect MQTT client cleanly
 - [ ] Register `MqttListenerService` as hosted service in `Program.cs`
 
 ### Retry and resilience
-- [ ] If printer is offline at startup do not crash — log warning and keep retrying
-- [ ] Add reconnect logic — attempt to reconnect every 30 seconds if connection drops
+- [ ] If printer is offline at startup — log warning and keep retrying, do not crash
+- [ ] Add reconnect loop — attempt to reconnect every 30 seconds if connection drops
 - [ ] Log each reconnect attempt with timestamp
-- [ ] Cap retry attempts or use exponential backoff to avoid hammering the network
+- [ ] Use `CancellationToken` from `StopAsync` to stop the retry loop cleanly
 
 ### Logging
 - [ ] Log on successful connection to printer
 - [ ] Log on connection failure with error details
 - [ ] Log each reconnect attempt
-- [ ] Log each print-finish event received
+- [ ] Log each print-finish event received with grams extracted
 - [ ] Log warning when no active spool is set
-- [ ] Log successful gram deduction with remaining weight
+- [ ] Log successful gram deduction with spool ID and remaining weight
 
 ---
 
@@ -83,13 +99,23 @@ By the end of this milestone finishing a print on your Bambu printer automatical
 | Password | LAN access code from printer screen |
 | Topic | `device/{serial}/report` |
 
-### Print-finish payload fields
+### Print-finish payload (relevant fields)
+
+```json
+{
+  "print": {
+    "gcode_state": "FINISH",
+    "filament_weight": 12.5,
+    "subtask_name": "benchy.gcode"
+  }
+}
+```
 
 | Field | Description |
 |---|---|
-| `print.gcode_state` | Must equal `"FINISH"` to process |
-| `print.filament_weight` | Grams used in the print |
-| `print.subtask_name` | Print file name, optional |
+| `print.gcode_state` | Must equal `"FINISH"` to process — other values: `"RUNNING"`, `"PAUSE"`, `"FAILED"`, `"IDLE"` |
+| `print.filament_weight` | Grams used in the print (float) |
+| `print.subtask_name` | Print file name, used as `PrintJob.PrintFileName` |
 
 ---
 
