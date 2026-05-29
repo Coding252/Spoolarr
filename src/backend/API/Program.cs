@@ -15,6 +15,13 @@ builder.Services.AddScoped<INfcTagRepository, NfcTagRepository>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<FilamentDbContext>();
+    db.Database.Migrate();
+    await SeedData.InitialiseAsync(db);
+}
+
 app.UseHttpsRedirection();
 app.MapControllers();
 
