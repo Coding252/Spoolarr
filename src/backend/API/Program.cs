@@ -1,3 +1,4 @@
+using API.Hubs;
 using Application.Interfaces;
 using Application.Services;
 using Infrastructure.Data;
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddSignalR();
 
 builder.Services.AddCors(options =>
 {
@@ -68,5 +70,6 @@ else
 
 app.UseHttpsRedirection();
 app.MapControllers();
+app.MapHub<NfcScanHub>("/hubs/nfc");
 
 app.Run();
