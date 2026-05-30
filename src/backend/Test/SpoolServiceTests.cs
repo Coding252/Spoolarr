@@ -96,25 +96,56 @@ public class SpoolServiceTests
     }
 
     [Fact]
-    public async Task UpdateWeightAsync_WhenFound_UpdatesWeight()
+    public async Task UpdateAsync_WhenFound_AppliesChangedFields()
     {
-        var spool = BuildSpool(weight: 500);
+        var spool = BuildSpool();
         _repo.GetByIdAsync(spool.Id).Returns(spool);
         _repo.UpdateAsync(Arg.Any<Spool>()).Returns(x => x.Arg<Spool>());
 
-        var result = await _sut.UpdateWeightAsync(spool.Id, new UpdateWeightRequest(250));
+        var result = await _sut.UpdateAsync(spool.Id, new UpdateSpoolRequest(
+            Brand: "Prusa", Material: null, ColorName: "Red", ColorHex: "#FF0000",
+            CurrentWeightG: null, SpoolWeightG: null, DiameterMm: null,
+            LowStockThresholdG: null, Notes: "updated"));
 
-        Assert.Equal(250, result!.CurrentWeightG);
+        Assert.NotNull(result);
+        Assert.Equal("Prusa", result.Brand);
+        Assert.Equal("PLA", result.Material);
+        Assert.Equal("Red", result.ColorName);
+        Assert.Equal("updated", result.Notes);
     }
 
     [Fact]
-    public async Task UpdateWeightAsync_WhenNotFound_ReturnsNull()
+    public async Task UpdateAsync_WhenNotFound_ReturnsNull()
     {
         _repo.GetByIdAsync(Arg.Any<Guid>()).Returns((Spool?)null);
 
-        var result = await _sut.UpdateWeightAsync(Guid.NewGuid(), new UpdateWeightRequest(100));
+        var result = await _sut.UpdateAsync(Guid.NewGuid(), new UpdateSpoolRequest(
+            null, null, null, null, null, null, null, null, null));
 
         Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_WhenFound_ReturnsTrue()
+    {
+        var spool = BuildSpool();
+        _repo.GetByIdAsync(spool.Id).Returns(spool);
+
+        var result = await _sut.DeleteAsync(spool.Id);
+
+        Assert.True(result);
+        await _repo.Received(1).DeleteAsync(spool.Id);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_WhenNotFound_ReturnsFalse()
+    {
+        _repo.GetByIdAsync(Arg.Any<Guid>()).Returns((Spool?)null);
+
+        var result = await _sut.DeleteAsync(Guid.NewGuid());
+
+        Assert.False(result);
+        await _repo.DidNotReceive().DeleteAsync(Arg.Any<Guid>());
     }
 
     private static Spool BuildSpool(bool isActive = false, float weight = 1000) => new()

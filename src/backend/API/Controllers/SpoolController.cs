@@ -36,10 +36,17 @@ public class SpoolController(ISpoolService spoolService) : ControllerBase
         return spool is null ? NotFound() : Ok(spool);
     }
 
-    [HttpPatch("{id:guid}/weight")]
-    public async Task<IActionResult> UpdateWeight(Guid id, [FromBody] UpdateWeightRequest request)
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSpoolRequest request)
     {
-        var spool = await spoolService.UpdateWeightAsync(id, request);
+        var spool = await spoolService.UpdateAsync(id, request);
         return spool is null ? NotFound() : Ok(spool);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var deleted = await spoolService.DeleteAsync(id);
+        return deleted ? NoContent() : NotFound();
     }
 }

@@ -59,15 +59,34 @@ public class SpoolService(ISpoolRepository spoolRepository) : ISpoolService
         return ToResponse(updated);
     }
 
-    public async Task<SpoolResponse?> UpdateWeightAsync(Guid id, UpdateWeightRequest request)
+    public async Task<SpoolResponse?> UpdateAsync(Guid id, UpdateSpoolRequest request)
     {
         var spool = await spoolRepository.GetByIdAsync(id);
         if (spool is null)
             return null;
 
-        spool.CurrentWeightG = request.NewWeightG;
+        if (request.Brand is not null) spool.Brand = request.Brand;
+        if (request.Material is not null) spool.Material = request.Material;
+        if (request.ColorName is not null) spool.ColorName = request.ColorName;
+        if (request.ColorHex is not null) spool.ColorHex = request.ColorHex;
+        if (request.CurrentWeightG is not null) spool.CurrentWeightG = request.CurrentWeightG.Value;
+        if (request.SpoolWeightG is not null) spool.SpoolWeightG = request.SpoolWeightG.Value;
+        if (request.DiameterMm is not null) spool.DiameterMm = request.DiameterMm.Value;
+        if (request.LowStockThresholdG is not null) spool.LowStockThresholdG = request.LowStockThresholdG.Value;
+        if (request.Notes is not null) spool.Notes = request.Notes;
+
         var updated = await spoolRepository.UpdateAsync(spool);
         return ToResponse(updated);
+    }
+
+    public async Task<bool> DeleteAsync(Guid id)
+    {
+        var spool = await spoolRepository.GetByIdAsync(id);
+        if (spool is null)
+            return false;
+
+        await spoolRepository.DeleteAsync(id);
+        return true;
     }
 
     private static SpoolResponse ToResponse(Spool spool) => new(

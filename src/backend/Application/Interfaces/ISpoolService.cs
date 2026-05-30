@@ -8,5 +8,6 @@ public interface ISpoolService
     Task<SpoolResponse?> GetByIdAsync(Guid id);
     Task<SpoolResponse> RegisterAsync(RegisterSpoolRequest request);
     Task<SpoolResponse?> ActivateAsync(Guid id);
-    Task<SpoolResponse?> UpdateWeightAsync(Guid id, UpdateWeightRequest request);
+    Task<SpoolResponse?> UpdateAsync(Guid id, UpdateSpoolRequest request);
+    Task<bool> DeleteAsync(Guid id);
 }
