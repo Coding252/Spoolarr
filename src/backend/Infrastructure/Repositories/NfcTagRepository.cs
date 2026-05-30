@@ -7,6 +7,16 @@ namespace Infrastructure.Repositories;
 
 public class NfcTagRepository(FilamentDbContext db) : INfcTagRepository
 {
+    public async Task<IEnumerable<NfcTag>> GetAllAsync()
+    {
+        return await db.NfcTags.ToListAsync();
+    }
+
+    public async Task<NfcTag?> GetByIdAsync(Guid id)
+    {
+        return await db.NfcTags.FindAsync(id);
+    }
+
     public async Task<NfcTag?> GetByTagUidAsync(string tagUid)
     {
         return await db.NfcTags
