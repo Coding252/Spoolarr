@@ -8,7 +8,7 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 
 | Milestone | Description | Status |
 |---|---|---|
-| [M0 — Project Bootstrap](#milestone-0--project-bootstrap) | Solution, EF Core, health check | ✅ Done |
+| [M0 — Project Bootstrap](#milestone-0--project-bootstrap) | Solution, EF Core, database connection | ✅ Done |
 | [M1 — Data Model](#milestone-1--data-model) | Entities, migrations, repositories, seed data | ✅ Done |
 | [M2 — Spool API](#milestone-2--spool-api) | REST endpoints for spool management | ✅ Done |
 | [M3 — NFC Scan Flow](#milestone-3--nfc-scan-flow) | Scan endpoint, NfcScanService, SignalR | ✅ Done |
@@ -22,7 +22,7 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 
 ## Milestone 0 — Project Bootstrap
 
-> Set up the solution structure, Docker skeleton, HTTPS proxy, database connection, and a working health check endpoint.
+> Set up the solution structure, Docker skeleton, HTTPS proxy, and database connection.
 
 📄 [Full milestone README](milestones/M0%20-%20Project%20Bootstrap/README.md)
 
@@ -34,7 +34,6 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 - [ ] Set up Docker + docker-compose skeleton
 - [ ] Configure Caddy for HTTPS
 - [ ] Set up EF Core + SQLite + `FilamentDbContext`
-- [ ] Basic health check endpoint `GET /health`
 
 ---
 
