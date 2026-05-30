@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.Text;
 using System.Text.Json;
+using Application.DTOs;
 using Application.Interfaces;
 using Domain.Models;
 using Microsoft.AspNetCore.DataProtection;
@@ -15,6 +16,8 @@ public class BambuMqttService : IHostedService
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IDataProtector _protector;
+    private readonly IPrinterStatusService _statusService;
+    private readonly IPrinterStatusPusher _statusPusher;
     private readonly ILogger<BambuMqttService> _logger;
     private IMqttClient? _mqttClient;
     private CancellationTokenSource? _cts;
@@ -23,10 +26,14 @@ public class BambuMqttService : IHostedService
     public BambuMqttService(
         IServiceScopeFactory scopeFactory,
         IDataProtectionProvider dataProtectionProvider,
+        IPrinterStatusService statusService,
+        IPrinterStatusPusher statusPusher,
         ILogger<BambuMqttService> logger)
     {
         _scopeFactory = scopeFactory;
         _protector = dataProtectionProvider.CreateProtector("BambuCloudPassword");
+        _statusService = statusService;
+        _statusPusher = statusPusher;
         _logger = logger;
     }
 
@@ -161,13 +168,29 @@ public class BambuMqttService : IHostedService
             using var doc = JsonDocument.Parse(payload);
             if (!doc.RootElement.TryGetProperty("print", out var print)) return;
             if (!print.TryGetProperty("gcode_state", out var stateEl)) return;
-            if (stateEl.GetString() != "FINISH") return;
+
+            var state = stateEl.GetString() ?? string.Empty;
+            var fileName = print.TryGetProperty("subtask_name", out var nameEl) ? nameEl.GetString() : null;
+
+            var status = new PrinterStatus(
+                GcodeState: state,
+                ProgressPercent: print.TryGetProperty("mc_percent", out var pct) ? pct.GetInt32() : 0,
+                RemainingMinutes: print.TryGetProperty("mc_remaining_time", out var rem) ? rem.GetInt32() : 0,
+                SubtaskName: fileName,
+                LayerNum: print.TryGetProperty("layer_num", out var layer) ? layer.GetInt32() : 0,
+                TotalLayerNum: print.TryGetProperty("total_layer_num", out var totalLayer) ? totalLayer.GetInt32() : 0,
+                NozzleTempC: print.TryGetProperty("nozzle_temper", out var nozzle) ? nozzle.GetSingle() : 0,
+                BedTempC: print.TryGetProperty("bed_temper", out var bed) ? bed.GetSingle() : 0,
+                UpdatedAt: DateTime.UtcNow);
+
+            _statusService.UpdateStatus(status);
+            await _statusPusher.PushAsync(status);
+
+            if (state != "FINISH") return;
 
             if (!print.TryGetProperty("filament_weight", out var weightEl)) return;
             var grams = weightEl.GetSingle();
             if (grams <= 0) return;
-
-            var fileName = print.TryGetProperty("subtask_name", out var nameEl) ? nameEl.GetString() : null;
 
             _logger.LogInformation("Print finished — {Grams}g used, file: {File}", grams, fileName ?? "unknown");
             await DeductFromActiveSpoolAsync(grams, fileName);
