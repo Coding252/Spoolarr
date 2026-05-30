@@ -83,24 +83,45 @@ public class SpoolControllerTests
     }
 
     [Fact]
-    public async Task UpdateWeight_WhenFound_ReturnsOk()
+    public async Task Update_WhenFound_ReturnsOk()
     {
         var id = Guid.NewGuid();
-        var request = new UpdateWeightRequest(300);
+        var request = new UpdateSpoolRequest("Prusa", null, "Red", "#FF0000", null, null, null, null, null);
         var response = BuildResponse();
-        _service.UpdateWeightAsync(id, request).Returns(response);
+        _service.UpdateAsync(id, request).Returns(response);
 
-        var result = await _sut.UpdateWeight(id, request);
+        var result = await _sut.Update(id, request);
 
         Assert.IsType<OkObjectResult>(result);
     }
 
     [Fact]
-    public async Task UpdateWeight_WhenNotFound_ReturnsNotFound()
+    public async Task Update_WhenNotFound_ReturnsNotFound()
     {
-        _service.UpdateWeightAsync(Arg.Any<Guid>(), Arg.Any<UpdateWeightRequest>()).Returns((SpoolResponse?)null);
+        _service.UpdateAsync(Arg.Any<Guid>(), Arg.Any<UpdateSpoolRequest>()).Returns((SpoolResponse?)null);
 
-        var result = await _sut.UpdateWeight(Guid.NewGuid(), new UpdateWeightRequest(100));
+        var result = await _sut.Update(Guid.NewGuid(), new UpdateSpoolRequest(null, null, null, null, null, null, null, null, null));
+
+        Assert.IsType<NotFoundResult>(result);
+    }
+
+    [Fact]
+    public async Task Delete_WhenFound_ReturnsNoContent()
+    {
+        var id = Guid.NewGuid();
+        _service.DeleteAsync(id).Returns(true);
+
+        var result = await _sut.Delete(id);
+
+        Assert.IsType<NoContentResult>(result);
+    }
+
+    [Fact]
+    public async Task Delete_WhenNotFound_ReturnsNotFound()
+    {
+        _service.DeleteAsync(Arg.Any<Guid>()).Returns(false);
+
+        var result = await _sut.Delete(Guid.NewGuid());
 
         Assert.IsType<NotFoundResult>(result);
     }
