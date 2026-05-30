@@ -41,7 +41,7 @@ builder.Services.AddScoped<INfcScanService, NfcScanService>();
 builder.Services.AddSingleton<IPrinterStatusService, PrinterStatusService>();
 builder.Services.AddSingleton<IPrinterStatusPusher, PrinterStatusPusher>();
 builder.Services.AddDataProtection();
-builder.Services.AddHostedService<BambuMqttService>();
+builder.Services.AddHostedService<MqttPrinterService>();
 
 var app = builder.Build();
 

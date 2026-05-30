@@ -12,26 +12,26 @@ using MQTTnet;
 
 namespace Infrastructure.Services;
 
-public class BambuMqttService : IHostedService
+public class MqttPrinterService : IHostedService
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IDataProtector _protector;
     private readonly IPrinterStatusService _statusService;
     private readonly IPrinterStatusPusher _statusPusher;
-    private readonly ILogger<BambuMqttService> _logger;
+    private readonly ILogger<MqttPrinterService> _logger;
     private IMqttClient? _mqttClient;
     private CancellationTokenSource? _cts;
     private Guid _connectedPrinterId;
 
-    public BambuMqttService(
+    public MqttPrinterService(
         IServiceScopeFactory scopeFactory,
         IDataProtectionProvider dataProtectionProvider,
         IPrinterStatusService statusService,
         IPrinterStatusPusher statusPusher,
-        ILogger<BambuMqttService> logger)
+        ILogger<MqttPrinterService> logger)
     {
         _scopeFactory = scopeFactory;
-        _protector = dataProtectionProvider.CreateProtector("BambuCloudPassword");
+        _protector = dataProtectionProvider.CreateProtector("MqttCloudPassword");
         _statusService = statusService;
         _statusPusher = statusPusher;
         _logger = logger;
@@ -93,7 +93,7 @@ public class BambuMqttService : IHostedService
             host = "us.mqtt.bambulab.com";
             username = printer.CloudEmail;
             var decrypted = _protector.Unprotect(printer.CloudPassword);
-            password = await FetchBambuTokenAsync(username, decrypted, ct);
+            password = await FetchCloudTokenAsync(username, decrypted, ct);
         }
         else
         {
@@ -127,7 +127,7 @@ public class BambuMqttService : IHostedService
         };
 
         await _mqttClient.ConnectAsync(options, ct);
-        _logger.LogInformation("Connected to Bambu printer via {Protocol} ({Host}:{Port})", printer.Protocol, host, port);
+        _logger.LogInformation("Connected to printer via {Protocol} ({Host}:{Port})", printer.Protocol, host, port);
 
         var serial = printer.SerialNumber ?? string.Empty;
         await _mqttClient.SubscribeAsync(new MqttClientSubscribeOptionsBuilder()
@@ -142,7 +142,7 @@ public class BambuMqttService : IHostedService
             _logger.LogWarning("[{Time}] MQTT connection dropped", DateTime.UtcNow);
     }
 
-    private static async Task<string> FetchBambuTokenAsync(string email, string password, CancellationToken ct)
+    private static async Task<string> FetchCloudTokenAsync(string email, string password, CancellationToken ct)
     {
         using var http = new HttpClient();
         var content = new FormUrlEncodedContent(new Dictionary<string, string>
@@ -155,7 +155,7 @@ public class BambuMqttService : IHostedService
         var json = await response.Content.ReadAsStringAsync(ct);
         using var doc = JsonDocument.Parse(json);
         return doc.RootElement.GetProperty("accessToken").GetString()
-               ?? throw new InvalidOperationException("Bambu cloud auth did not return an access token");
+               ?? throw new InvalidOperationException("Cloud auth did not return an access token");
     }
 
     private async Task OnMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs args)
