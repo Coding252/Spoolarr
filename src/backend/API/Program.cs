@@ -1,4 +1,5 @@
 using API.Hubs;
+using API.Services;
 using Application.Interfaces;
 using Application.Services;
 using Infrastructure.Data;
@@ -37,6 +38,8 @@ builder.Services.AddScoped<IPrintJobRepository, PrintJobRepository>();
 builder.Services.AddScoped<INfcTagRepository, NfcTagRepository>();
 builder.Services.AddScoped<ISpoolService, SpoolService>();
 builder.Services.AddScoped<INfcScanService, NfcScanService>();
+builder.Services.AddSingleton<IPrinterStatusService, PrinterStatusService>();
+builder.Services.AddSingleton<IPrinterStatusPusher, PrinterStatusPusher>();
 builder.Services.AddDataProtection();
 builder.Services.AddHostedService<BambuMqttService>();
 
@@ -76,5 +79,6 @@ else
 app.UseHttpsRedirection();
 app.MapControllers();
 app.MapHub<NfcScanHub>("/hubs/nfc");
+app.MapHub<PrinterHub>("/hubs/printer");
 
 app.Run();
