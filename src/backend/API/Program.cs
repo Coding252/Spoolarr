@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Application.Services;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -36,6 +37,8 @@ builder.Services.AddScoped<IPrintJobRepository, PrintJobRepository>();
 builder.Services.AddScoped<INfcTagRepository, NfcTagRepository>();
 builder.Services.AddScoped<ISpoolService, SpoolService>();
 builder.Services.AddScoped<INfcScanService, NfcScanService>();
+builder.Services.AddDataProtection();
+builder.Services.AddHostedService<BambuMqttService>();
 
 var app = builder.Build();
 
