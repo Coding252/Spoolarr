@@ -188,7 +188,7 @@ Each milestone has its own detailed README with tasks and definition of done.
 | [M1 — Data Model](docs/milestones/M1-data-model/README.md) | `Spool`, `Printer`, `PrintJob`, `NfcTag` entities, migrations, repositories, seed data | ✅ Done |
 | [M2 — Spool API](docs/milestones/M2-spool-api/README.md) | REST endpoints for spool management | ✅ Done |
 | [M3 — NFC Scan Flow](docs/milestones/M3-nfc-scan/README.md) | Scan endpoint, `NfcScanService`, SignalR real-time push | ✅ Done |
-| [M4 — Bambu MQTT](docs/milestones/M4-bambu-mqtt/README.md) | MQTT listener, print-finish event, auto gram deduction | ⬜ Not started |
+| [M4 — Bambu MQTT](docs/milestones/M4-bambu-mqtt/README.md) | MQTT listener, print-finish event, auto gram deduction | ✅ Done |
 | [M5 — Web UI](docs/milestones/M5-web-ui/README.md) | Dashboard, scan page, Web NFC, QR fallback, register form | ⬜ Not started |
 | [M6 — Alerts](docs/milestones/M6-alerts/README.md) | Low stock threshold check, ntfy / webhook notifications | ⬜ Not started |
 | [M7 — AMS Support](docs/milestones/M7-ams/README.md) | Multi-slot mapping, AMS MQTT parsing, slot UI | ⬜ Not started |
@@ -431,22 +431,31 @@ Each milestone has its own detailed README with tasks and definition of done.
 <summary>Milestone 4 — Bambu MQTT</summary>
 
 #### NuGet packages
-- [ ] Install `MQTTnet` in `Infrastructure`
-- [ ] Install `MQTTnet.Extensions.ManagedClient` in `Infrastructure`
+- [x] Install `MQTTnet` v5 in `Infrastructure`
 
-#### Settings
-- [ ] Create `BambuMqttSettings` in `Infrastructure/Settings/`
-- [ ] Add `BambuMqtt` section to `appsettings.json`
-- [ ] Register settings in `Program.cs`
+#### Printer entity migration
+- [x] Add `CloudEmail` field to `Printer` entity — nullable string
+- [x] Add `CloudPassword` field to `Printer` entity — nullable string, stored encrypted
+- [x] EF Core migration `AddPrinterCloudFields` applied
 
-#### MqttListenerService
-- [ ] Create `MqttListenerService` in `Infrastructure/Services/`
-- [ ] Implement `IHostedService`
-- [ ] Connect to printer, subscribe to `device/{serial}/report`
-- [ ] Parse print-finish event, extract grams used
-- [ ] Deduct grams from active spool, log `PrintJob`
-- [ ] Add retry and reconnect logic
-- [ ] Register as hosted service in `Program.cs`
+#### BambuMqttService
+- [x] Create `BambuMqttService` in `Infrastructure/Services/`
+- [x] Implement `IHostedService`
+- [x] LAN mode — connects to `Printer.IpAddress:Port`, username `bblp`, password = AccessCode
+- [x] Cloud mode — decrypts CloudPassword via Data Protection, fetches JWT from Bambu login API, connects to `us.mqtt.bambulab.com`
+- [x] Subscribe to `device/{serial}/report`
+- [x] Parse print-finish event, extract grams used
+- [x] Deduct grams from active spool, floor at 0, log `PrintJob`
+- [x] Retry every 30 seconds — no printer in DB, offline at startup, connection drop
+- [x] Register as hosted service in `Program.cs`
+
+#### Live printer status
+- [x] `PrinterStatus` DTO in `Application/DTOs/`
+- [x] `IPrinterStatusService` + `PrinterStatusService` — singleton, in-memory
+- [x] `IPrinterStatusPusher` + `PrinterStatusPusher` — SignalR push abstraction
+- [x] `PrinterHub` mapped to `/hubs/printer`
+- [x] Push `PrinterStatus` on every MQTT message
+- [x] `GET /api/printers/status` — `200` with status or `204` if not connected
 
 </details>
 
