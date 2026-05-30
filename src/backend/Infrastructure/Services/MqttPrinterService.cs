@@ -1,9 +1,7 @@
 using System.Buffers;
 using System.Text;
 using System.Text.Json;
-using Application.DTOs;
 using Application.Interfaces;
-using Domain.Models;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,8 +14,6 @@ public class MqttPrinterService : IHostedService
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IDataProtector _protector;
-    private readonly IPrinterStatusService _statusService;
-    private readonly IPrinterStatusPusher _statusPusher;
     private readonly ILogger<MqttPrinterService> _logger;
     private IMqttClient? _mqttClient;
     private CancellationTokenSource? _cts;
@@ -26,14 +22,10 @@ public class MqttPrinterService : IHostedService
     public MqttPrinterService(
         IServiceScopeFactory scopeFactory,
         IDataProtectionProvider dataProtectionProvider,
-        IPrinterStatusService statusService,
-        IPrinterStatusPusher statusPusher,
         ILogger<MqttPrinterService> logger)
     {
         _scopeFactory = scopeFactory;
         _protector = dataProtectionProvider.CreateProtector("MqttCloudPassword");
-        _statusService = statusService;
-        _statusPusher = statusPusher;
         _logger = logger;
     }
 
@@ -163,76 +155,14 @@ public class MqttPrinterService : IHostedService
         try
         {
             var payload = Encoding.UTF8.GetString(args.ApplicationMessage.Payload.ToArray());
-            if (string.IsNullOrEmpty(payload)) return;
-
-            using var doc = JsonDocument.Parse(payload);
-            if (!doc.RootElement.TryGetProperty("print", out var print)) return;
-            if (!print.TryGetProperty("gcode_state", out var stateEl)) return;
-
-            var state = stateEl.GetString() ?? string.Empty;
-            var fileName = print.TryGetProperty("subtask_name", out var nameEl) ? nameEl.GetString() : null;
-
-            var status = new PrinterStatus(
-                GcodeState: state,
-                ProgressPercent: print.TryGetProperty("mc_percent", out var pct) ? pct.GetInt32() : 0,
-                RemainingMinutes: print.TryGetProperty("mc_remaining_time", out var rem) ? rem.GetInt32() : 0,
-                SubtaskName: fileName,
-                LayerNum: print.TryGetProperty("layer_num", out var layer) ? layer.GetInt32() : 0,
-                TotalLayerNum: print.TryGetProperty("total_layer_num", out var totalLayer) ? totalLayer.GetInt32() : 0,
-                NozzleTempC: print.TryGetProperty("nozzle_temper", out var nozzle) ? nozzle.GetSingle() : 0,
-                BedTempC: print.TryGetProperty("bed_temper", out var bed) ? bed.GetSingle() : 0,
-                UpdatedAt: DateTime.UtcNow);
-
-            _statusService.UpdateStatus(status);
-            await _statusPusher.PushAsync(status);
-
-            if (state != "FINISH") return;
-
-            if (!print.TryGetProperty("filament_weight", out var weightEl)) return;
-            var grams = weightEl.GetSingle();
-            if (grams <= 0) return;
-
-            _logger.LogInformation("Print finished — {Grams}g used, file: {File}", grams, fileName ?? "unknown");
-            await DeductFromActiveSpoolAsync(grams, fileName);
+            using var scope = _scopeFactory.CreateScope();
+            var processor = scope.ServiceProvider.GetRequiredService<IMqttMessageProcessor>();
+            await processor.ProcessAsync(payload, _connectedPrinterId);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error processing MQTT message");
         }
-    }
-
-    private async Task DeductFromActiveSpoolAsync(float grams, string? fileName)
-    {
-        using var scope = _scopeFactory.CreateScope();
-        var spoolRepo = scope.ServiceProvider.GetRequiredService<ISpoolRepository>();
-        var printJobRepo = scope.ServiceProvider.GetRequiredService<IPrintJobRepository>();
-
-        var spool = await spoolRepo.GetActiveAsync();
-        if (spool is null)
-        {
-            _logger.LogWarning("Print finished but no active spool is set — skipping deduction");
-            return;
-        }
-
-        spool.CurrentWeightG = Math.Max(0, spool.CurrentWeightG - grams);
-        await spoolRepo.UpdateAsync(spool);
-        _logger.LogInformation("Deducted {Grams}g from spool {SpoolId}. Remaining: {Weight}g",
-            grams, spool.Id, spool.CurrentWeightG);
-
-        var now = DateTime.UtcNow;
-        await printJobRepo.CreateAsync(new PrintJob
-        {
-            Id = Guid.NewGuid(),
-            SpoolId = spool.Id,
-            PrinterId = _connectedPrinterId,
-            GramsUsed = grams,
-            PrintFileName = fileName,
-            Status = "finished",
-            Source = "mqtt",
-            StartedAt = now,
-            FinishedAt = now,
-            LastUpdatedAt = now
-        });
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
