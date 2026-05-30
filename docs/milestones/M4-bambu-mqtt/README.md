@@ -1,12 +1,12 @@
 # Milestone 4 — Bambu Lab MQTT Integration
 
-> Connect to the Bambu Lab printer on the local network via MQTT, listen for print-finish events, extract grams used, automatically deduct from the active spool, and stream live printer status to the browser via SignalR.
+> Connect to the Bambu Lab printer via MQTT (LAN or Cloud), listen for print-finish events, extract grams used, automatically deduct from the active spool, and stream live printer status to the browser via SignalR.
 
 ---
 
 ## Goal
 
-By the end of this milestone finishing a print on your Bambu printer automatically deducts the correct grams from the active spool and logs the print job to the database — no manual input required. Live printer status (state, progress, temperatures) is also pushed to the browser in real time via SignalR.
+By the end of this milestone finishing a print on your Bambu printer automatically deducts the correct grams from the active spool and logs the print job to the database — no manual input required. The user configures the printer connection (LAN or Cloud) through the Web UI. Live printer status (state, progress, temperatures) is pushed to the browser in real time via SignalR.
 
 ---
 
@@ -32,48 +32,84 @@ The following are already in place:
 
 ---
 
+## Connection Modes
+
+The user configures the printer in the Web UI and picks one of two modes:
+
+### LAN Mode (`Protocol = "bambu_lan"`)
+Connects directly to the printer on the local network. Requires LAN Mode enabled on the printer screen.
+
+| Setting | Source |
+|---|---|
+| Host | `Printer.IpAddress` |
+| Port | `Printer.Port` (default `8883`) |
+| Username | `bblp` (fixed for all Bambu printers) |
+| Password | `Printer.AccessCode` |
+| Topic | `device/{Printer.SerialNumber}/report` |
+
+### Cloud Mode (`Protocol = "bambu_cloud"`)
+Connects to Bambu's cloud MQTT broker. Works from anywhere — no LAN Mode required.
+
+| Setting | Source |
+|---|---|
+| Host | `us.mqtt.bambulab.com` (fixed) |
+| Port | `Printer.Port` (default `8883`) |
+| Username | `Printer.CloudEmail` |
+| Password | JWT token fetched from Bambu login API using `Printer.CloudEmail` + `Printer.CloudPassword` |
+| Topic | `device/{Printer.SerialNumber}/report` |
+
+`Printer.CloudPassword` is stored encrypted using ASP.NET Core Data Protection (`IDataProtector`).
+
+---
+
 ## Tasks
 
-### NuGet packages
+### M4-S1 — NuGet
 - [ ] Install `MQTTnet` version 5.x in `src/backend/Infrastructure`
   - Note: `MQTTnet.Extensions.ManagedClient` was removed in v5 — do not install it
 
-### Settings
-- [ ] Create `BambuMqttSettings` class inside `src/backend/Infrastructure/Settings/`
-- [ ] Add `PrinterIp` field — string
-- [ ] Add `Port` field — int, default `8883`
-- [ ] Add `Serial` field — string
-- [ ] Add `AccessCode` field — string
-- [ ] Add `BambuMqtt` section to `src/backend/API/appsettings.json` with placeholder values
-- [ ] Add `BambuMqtt` section to `src/backend/API/appsettings.Development.json` with real local values for testing
-- [ ] Register `BambuMqttSettings` in `Program.cs` via `builder.Services.Configure<BambuMqttSettings>(...)`
+### M4-S2 — Printer entity migration
+- [ ] Add `Port` field to `Printer` entity — int, default `8883`
+- [ ] Add `CloudEmail` field to `Printer` entity — string, nullable
+- [ ] Add `CloudPassword` field to `Printer` entity — string, nullable (stored encrypted)
+- [ ] Add EF Core migration for the 3 new fields
 
-### MqttListenerService
-- [ ] Create `MqttListenerService` class inside `src/backend/Infrastructure/Services/`
+### M4-S3 — BambuMqttService
+- [ ] Create `BambuMqttService` class inside `src/backend/Infrastructure/Services/`
 - [ ] Implement `IHostedService` interface
-- [ ] Inject `IServiceScopeFactory`, `IOptions<BambuMqttSettings>`, `ILogger<MqttListenerService>`
-- [ ] Add `StartAsync` — create `MqttFactory`, build `IMqttClient`, connect to printer using settings
+- [ ] Inject `IServiceScopeFactory`, `IDataProtectionProvider`, `ILogger<BambuMqttService>`
+- [ ] Add `StartAsync` — load printer from DB via `IPrinterRepository`, branch on `Protocol`
+- [ ] **LAN connect** — build `IMqttClient`, connect to `Printer.IpAddress:Printer.Port` with TLS, username `bblp`, password = `Printer.AccessCode`
+- [ ] **Cloud connect** — decrypt `Printer.CloudPassword`, POST to Bambu login API to get JWT token, connect to `us.mqtt.bambulab.com:Printer.Port` with TLS, username = `Printer.CloudEmail`, password = JWT token
 - [ ] Configure TLS with `ValidateServerCertificate = false` for LAN use
-- [ ] Set MQTT credentials — username `bblp`, password = `AccessCode`
-- [ ] Subscribe to topic `device/{serial}/report` on successful connect
+- [ ] Subscribe to `device/{serial}/report` on successful connect
 - [ ] Add `OnMessageReceivedAsync` — fires on every MQTT message
 - [ ] Parse incoming JSON payload with `System.Text.Json`
-- [ ] Check `print.gcode_state` equals `"FINISH"` before processing — skip all other states
-- [ ] Extract `print.filament_weight` (grams, float) from payload
+- [ ] **Print finish** — check `print.gcode_state == "FINISH"`, extract `print.filament_weight`, call `DeductFromActiveSpoolAsync`
 - [ ] Skip message if grams is 0 or missing
-- [ ] Call `DeductFromActiveSpoolAsync` with extracted grams and print file name
-- [ ] Add `DeductFromActiveSpoolAsync` — deduct grams and log print job
-- [ ] Use `IServiceScopeFactory` to create a scope and resolve `ISpoolRepository`, `IPrintJobRepository`
-- [ ] Get active spool via `ISpoolRepository.GetActiveAsync`
-- [ ] Log warning and return if no active spool is set
+- [ ] **Deduction** — use `IServiceScopeFactory` to resolve `ISpoolRepository`, `IPrintJobRepository`
+- [ ] Get active spool via `ISpoolRepository.GetActiveAsync`, log warning and return if none
 - [ ] Subtract grams from `CurrentWeightG`, floor at 0, save via `ISpoolRepository.UpdateAsync`
-- [ ] Create `PrintJob` record — set `SpoolId`, `GramsUsed`, `Status = "finished"`, `Source = "mqtt"`, `StartedAt = FinishedAt = UtcNow`
+- [ ] Create `PrintJob` record — `SpoolId`, `GramsUsed`, `Status = "finished"`, `Source = "mqtt"`, `StartedAt = FinishedAt = UtcNow`
 - [ ] Save print job via `IPrintJobRepository.CreateAsync`
-- [ ] Log successful deduction with grams used and remaining weight
 - [ ] Add `StopAsync` — disconnect MQTT client cleanly
-- [ ] Register `MqttListenerService` as hosted service in `Program.cs`
+- [ ] Register `BambuMqttService` as hosted service in `Program.cs`
 
-### Live printer status (M4-S4)
+### M4-S3 — Retry and resilience
+- [ ] If no printer in DB at startup — log warning, retry every 30 seconds
+- [ ] If printer offline at startup — log warning, retry every 30 seconds
+- [ ] Add reconnect loop — attempt to reconnect every 30 seconds if connection drops
+- [ ] Use `CancellationToken` from `StopAsync` to stop retry loop cleanly
+
+### M4-S3 — Logging
+- [ ] Log on successful connection (LAN or Cloud)
+- [ ] Log on connection failure with error details
+- [ ] Log each reconnect attempt with timestamp
+- [ ] Log each print-finish event with grams extracted
+- [ ] Log warning when no active spool is set
+- [ ] Log successful gram deduction with spool ID and remaining weight
+
+### M4-S4 — Live printer status
 - [ ] Create `PrinterStatus` record inside `src/backend/Application/DTOs/`
   - `GcodeState` — string (`IDLE`, `RUNNING`, `PAUSE`, `FINISH`, `FAILED`)
   - `ProgressPercent` — int (0–100)
@@ -85,48 +121,20 @@ The following are already in place:
   - `BedTempC` — float
   - `UpdatedAt` — DateTime (UTC)
 - [ ] Create `IPrinterStatusService` interface inside `src/backend/Application/Interfaces/`
-  - `GetStatus()` — returns current `PrinterStatus?` (in-memory, no DB)
-  - `UpdateStatus(PrinterStatus status)` — called by MQTT listener on every message
-- [ ] Create `PrinterStatusService` inside `src/backend/Application/Services/` implementing `IPrinterStatusService`
-  - Store status as a private field — no DB write, in-memory only
-  - Register as singleton in `Program.cs`
+  - `GetStatus()` — returns `PrinterStatus?`
+  - `UpdateStatus(PrinterStatus status)`
+- [ ] Create `PrinterStatusService` inside `src/backend/Application/Services/` — in-memory, no DB
+- [ ] Register `PrinterStatusService` as singleton in `Program.cs`
 - [ ] Create `PrinterHub` class inside `src/backend/API/Hubs/`
 - [ ] Register and map `PrinterHub` to `/hubs/printer` in `Program.cs`
-- [ ] Inject `IPrinterStatusService` and `IHubContext<PrinterHub>` into `MqttListenerService`
-- [ ] In `OnMessageReceivedAsync` — parse status fields from every message regardless of `gcode_state`
-- [ ] Call `IPrinterStatusService.UpdateStatus(...)` with parsed values
-- [ ] Push `PrinterStatus` to all SignalR clients via `PrinterHub` — event name `PrinterStatus`
-- [ ] Add `GET /api/printers/status` endpoint in a new `PrinterController`
-  - Return current `PrinterStatus` from `IPrinterStatusService.GetStatus()`
-  - Return `204 No Content` if no status received yet
-
-### Retry and resilience
-- [ ] If printer is offline at startup — log warning and keep retrying, do not crash
-- [ ] Add reconnect loop — attempt to reconnect every 30 seconds if connection drops
-- [ ] Log each reconnect attempt with timestamp
-- [ ] Use `CancellationToken` from `StopAsync` to stop the retry loop cleanly
-
-### Logging
-- [ ] Log on successful connection to printer
-- [ ] Log on connection failure with error details
-- [ ] Log each reconnect attempt
-- [ ] Log each print-finish event received with grams extracted
-- [ ] Log warning when no active spool is set
-- [ ] Log successful gram deduction with spool ID and remaining weight
+- [ ] In `BambuMqttService.OnMessageReceivedAsync` — parse status fields from every message, call `IPrinterStatusService.UpdateStatus`, push via `PrinterHub` (event name `PrinterStatus`)
+- [ ] Add `GET /api/printers/status` in `PrinterController` — returns `PrinterStatus` or `204` if not connected
 
 ---
 
 ## Bambu MQTT Reference
 
-| Setting | Value |
-|---|---|
-| Host | Printer LAN IP |
-| Port | `8883` (TLS) |
-| Username | `bblp` |
-| Password | LAN access code from printer screen |
-| Topic | `device/{serial}/report` |
-
-### Print-finish payload (relevant fields)
+### Print-finish payload
 
 ```json
 {
@@ -138,13 +146,7 @@ The following are already in place:
 }
 ```
 
-| Field | Description |
-|---|---|
-| `print.gcode_state` | Must equal `"FINISH"` to process — other values: `"RUNNING"`, `"PAUSE"`, `"FAILED"`, `"IDLE"` |
-| `print.filament_weight` | Grams used in the print (float) |
-| `print.subtask_name` | Print file name, used as `PrintJob.PrintFileName` |
-
-### Live status payload (all messages)
+### Live status payload
 
 ```json
 {
@@ -172,11 +174,19 @@ The following are already in place:
 | `print.nozzle_temper` | `PrinterStatus.NozzleTempC` |
 | `print.bed_temper` | `PrinterStatus.BedTempC` |
 
+### Cloud auth endpoint
+
+```
+POST https://bambulab.com/api/sign-in/form
+Body: { "account": "email", "password": "password" }
+Response: { "accessToken": "jwt..." }
+```
+
 ---
 
 ## Definition of Done
 
-- [ ] Service starts and connects to printer when API boots
+- [ ] Service starts and connects to printer when API boots (LAN or Cloud)
 - [ ] Logs confirm successful MQTT connection
 - [ ] Print-finish event is detected and processed
 - [ ] Grams are correctly deducted from the active spool
@@ -184,8 +194,9 @@ The following are already in place:
 - [ ] Warning is logged if no active spool is set
 - [ ] `CurrentWeightG` never goes below 0
 - [ ] Service disconnects cleanly when API shuts down
-- [ ] Service retries connection when printer is offline at startup
+- [ ] Service retries when printer is offline at startup or no printer in DB
 - [ ] Service reconnects automatically if connection drops mid-session
 - [ ] `GET /api/printers/status` returns current printer state
 - [ ] `PrinterStatus` SignalR event fires on every MQTT message
 - [ ] Browser receives live state, progress, and temperature updates
+- [ ] Cloud password is stored encrypted, never exposed in API responses
