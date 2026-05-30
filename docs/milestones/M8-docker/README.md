@@ -30,7 +30,6 @@ By the end of this milestone the API and Caddy proxy are running inside Docker C
 
 ### Manual verification
 - [ ] Run `docker compose up --build` and confirm it starts without errors
-- [ ] Confirm `GET /health` returns `200 OK` from inside Docker
 - [ ] Confirm the SQLite file is created at `/data/spoolarr.db` on container start
 - [ ] Confirm Caddy proxies HTTPS traffic to the API on the local network
 
@@ -39,7 +38,6 @@ By the end of this milestone the API and Caddy proxy are running inside Docker C
 ## Definition of Done
 
 - [ ] `docker compose up --build` starts without errors
-- [ ] `GET /health` returns `200 OK` via Caddy HTTPS
 - [ ] SQLite file is created at `/data/spoolarr.db` on container start
 - [ ] Caddy proxies HTTPS traffic to the API on the local network
 - [ ] API responds correctly in the Docker environment

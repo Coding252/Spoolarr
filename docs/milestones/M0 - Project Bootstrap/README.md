@@ -1,12 +1,12 @@
 # Milestone 0 — Project Bootstrap
 
-> Get the C# backend solution created, structured, and running locally with a working database connection and health check.
+> Get the C# backend solution created, structured, and running locally with a working database connection.
 
 ---
 
 ## Goal
 
-By the end of this milestone the ASP.NET Core API is running locally, connected to a SQLite database, and responding to a health check endpoint. No features yet — just a solid foundation to build on.
+By the end of this milestone the ASP.NET Core API is running locally and connected to a SQLite database. No features yet — just a solid foundation to build on.
 
 ---
 
@@ -64,10 +64,6 @@ Nothing. This is the first milestone.
 - [x] Add SQLite connection string to `appsettings.json` in `src/backend/API`
 - [x] Register `FilamentDbContext` in `Program.cs`
 
-### Health check
-- [x] Create `HealthController` inside `src/backend/API/Controllers/`
-- [x] Add `GET /health` endpoint that returns `{ status: "ok", app: "Spoolarr" }`
-
 ### Environment config
 - [x] Create `appsettings.Development.json` for local dev
 - [x] Set SQLite connection string in `appsettings.Development.json` pointing to a local file path
@@ -77,7 +73,7 @@ Nothing. This is the first milestone.
 - [x] Ignore `bin/`, `obj/`, `*.db`, `*.db-shm`, `*.db-wal`, `.env`, `appsettings.*.json` (except default)
 
 ### Manual verification
-- [x] Run the API locally with `dotnet run` and confirm `GET /health` returns `200 OK`
+- [x] Run the API locally with `dotnet run` and confirm the API starts without errors
 - [x] Confirm the SQLite file is created at the local path defined in `appsettings.Development.json`
 
 ---
@@ -85,6 +81,5 @@ Nothing. This is the first milestone.
 ## Definition of Done
 
 - [x] `dotnet build` passes with no errors
-- [x] `GET /health` returns `200 OK` when running locally with `dotnet run`
+- [x] API starts without errors when running locally with `dotnet run`
 - [x] SQLite file is created at the local path on first run
-- [x] Health endpoint responds correctly in local dev environment
