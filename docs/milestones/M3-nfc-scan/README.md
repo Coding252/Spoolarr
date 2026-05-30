@@ -54,13 +54,23 @@ The following are already in place from Milestone 2:
 - [x] Register SignalR in `Program.cs` via `builder.Services.AddSignalR()`
 - [x] Map hub endpoint to `/hubs/nfc` in `Program.cs`
 
-### ScanController
-- [x] Create `ScanController` inside `src/backend/API/Controllers/`
-- [x] Add `POST /api/spools/scan` endpoint accepting `ScanRequest` body
+### NfcTagController
+- [x] Create `NfcTagController` inside `src/backend/API/Controllers/` (route: `api/nfc-tags`)
+- [x] Add `GET /api/nfc-tags` — returns all NFC tags
+- [x] Add `GET /api/nfc-tags/{id}` — returns tag by ID or `404`
+- [x] Add `POST /api/nfc-tags` — registers new tag, returns `201 Created`
+- [x] Add `DELETE /api/nfc-tags/{id}` — deletes tag, returns `204` or `404`
+- [x] Add `POST /api/nfc-tags/scan` endpoint accepting `ScanRequest` body
 - [x] Validate `TagUid` is not empty — return `400` if missing
 - [x] Call `INfcScanService.ProcessScanAsync` with the tag UID
 - [x] Push `NfcScanResult` to all SignalR clients via `IHubContext<NfcScanHub>`
 - [x] Return `200 OK` with the `NfcScanResult`
+
+### NfcTagService
+- [x] Create `INfcTagService` interface inside `src/backend/Application/Interfaces/`
+- [x] Create `NfcTagService` class inside `src/backend/Application/Services/` implementing `INfcTagService`
+- [x] Add `GetAllAsync`, `GetByIdAsync`, `RegisterAsync`, `DeleteAsync`
+- [x] Register `INfcTagService` → `NfcTagService` as scoped in `Program.cs`
 
 ### CORS for SignalR
 - [x] Add `AllowCredentials()` to CORS policies in `Program.cs` — required for SignalR WebSocket handshake
@@ -77,7 +87,11 @@ The following are already in place from Milestone 2:
 
 | Method | Endpoint | Returns |
 |---|---|---|
-| `POST` | `/api/spools/scan` | `200` NfcScanResult |
+| `GET` | `/api/nfc-tags` | `200` list of NFC tags |
+| `GET` | `/api/nfc-tags/{id}` | `200` tag or `404` |
+| `POST` | `/api/nfc-tags` | `201` created tag |
+| `DELETE` | `/api/nfc-tags/{id}` | `204` or `404` |
+| `POST` | `/api/nfc-tags/scan` | `200` NfcScanResult |
 
 ### NfcScanResult shape
 
@@ -101,9 +115,12 @@ The following are already in place from Milestone 2:
 
 ## Definition of Done
 
-- [x] `POST /api/spools/scan` with known UID activates spool and returns `"activated"`
-- [x] `POST /api/spools/scan` with unknown UID returns `"unknown"` with null spool
-- [x] `POST /api/spools/scan` with empty `TagUid` returns `400`
+- [x] `POST /api/nfc-tags/scan` with known UID activates spool and returns `"activated"`
+- [x] `POST /api/nfc-tags/scan` with unknown UID returns `"unknown"` with null spool
+- [x] `POST /api/nfc-tags/scan` with empty `TagUid` returns `400`
+- [x] `GET /api/nfc-tags` returns all registered tags
+- [x] `POST /api/nfc-tags` registers a new tag and returns `201`
+- [x] `DELETE /api/nfc-tags/{id}` removes a tag and returns `204`
 - [x] SignalR hub is accessible at `/hubs/nfc`
 - [x] `ScanResult` SignalR event fires on every scan
 - [x] Both known and unknown tag scenarios tested with Postman or curl

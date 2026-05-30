@@ -30,10 +30,10 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 
 ### Tasks
 
-- [ ] Create solution `Spoolarr.sln` with `Spoolarr.Api` and `Spoolarr.Web` projects
-- [ ] Set up Docker + docker-compose skeleton
-- [ ] Configure Caddy for HTTPS
-- [ ] Set up EF Core + SQLite + `FilamentDbContext`
+- [x] Create solution `backend.sln` with `API`, `Application`, `Domain`, `Infrastructure`, and `Test` projects
+- [x] Set up EF Core + SQLite + `FilamentDbContext`
+- [x] Configure environment and connection string in `appsettings.json`
+- [x] Auto-migration and error handling on startup
 
 ---
 
@@ -66,11 +66,12 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 
 ### Tasks
 
-- [ ] `GET /api/spools` — list all spools
-- [ ] `GET /api/spools/{id}` — get single spool
-- [ ] `POST /api/spools` — register new spool
-- [ ] `PATCH /api/spools/{id}/activate` — set active spool
-- [ ] `PATCH /api/spools/{id}/weight` — update weight manually
+- [x] `GET /api/spools` — list all spools
+- [x] `GET /api/spools/{id}` — get single spool
+- [x] `POST /api/spools` — register new spool
+- [x] `PATCH /api/spools/{id}/activate` — set active spool
+- [x] `PUT /api/spools/{id}` — update spool fields
+- [x] `DELETE /api/spools/{id}` — delete spool
 
 ---
 
@@ -84,9 +85,13 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 
 ### Tasks
 
-- [ ] `POST /api/spools/scan` — receives tag UID, routes to register or activate
-- [ ] `NfcScanService` — lookup by UID, return spool or "unknown tag"
-- [ ] `NfcScanHub` SignalR — push scan result to browser in real time
+- [x] `POST /api/nfc-tags/scan` — receives tag UID, activates spool or returns "unknown"
+- [x] `NfcScanService` — lookup by UID, return spool or "unknown tag"
+- [x] `NfcScanHub` SignalR — push scan result to browser in real time
+- [x] `GET /api/nfc-tags` — list all NFC tags
+- [x] `GET /api/nfc-tags/{id}` — get NFC tag by ID
+- [x] `POST /api/nfc-tags` — register new NFC tag (link UID to spool)
+- [x] `DELETE /api/nfc-tags/{id}` — delete NFC tag
 
 ---
 

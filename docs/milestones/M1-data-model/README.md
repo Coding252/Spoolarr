@@ -139,6 +139,8 @@ By the end of this milestone the database has four tables — `Spools`, `Printer
 ### NfcTag repository
 - [x] Create `INfcTagRepository` interface inside `src/back-end/Infrastructure/Repositories/`
 - [x] Create `NfcTagRepository` class implementing `INfcTagRepository`
+- [x] Add `GetAllAsync` — return all NFC tags
+- [x] Add `GetByIdAsync` — return NFC tag by ID
 - [x] Add `GetByTagUidAsync` — return NFC tag by its physical UID, includes the linked Spool
 - [x] Add `GetBySpoolIdAsync` — return all NFC tags for a spool
 - [x] Add `CreateAsync` — insert new NFC tag linked to a spool

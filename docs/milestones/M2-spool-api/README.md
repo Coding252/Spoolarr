@@ -84,7 +84,8 @@ The following are already in place from Milestone 1:
 - [x] Add `GET /api/spools/{id}` — returns `200` with spool or `404 Not Found`
 - [x] Add `POST /api/spools` — registers new spool, returns `201 Created` with `Location` header
 - [x] Add `PATCH /api/spools/{id}/activate` — activates spool, returns `200` updated spool or `404`
-- [x] Add `PATCH /api/spools/{id}/weight` — updates weight, returns `200` updated spool or `404`
+- [x] Add `PUT /api/spools/{id}` — patch-style update of any spool fields, returns `200` or `404`
+- [x] Add `DELETE /api/spools/{id}` — deletes spool, returns `204` or `404`
 
 ### Validation
 - [x] `Brand` is required on register
@@ -120,7 +121,8 @@ The following are already in place from Milestone 1:
 | `GET` | `/api/spools/{id}` | `200` spool or `404` |
 | `POST` | `/api/spools` | `201` created spool |
 | `PATCH` | `/api/spools/{id}/activate` | `200` updated spool or `404` |
-| `PATCH` | `/api/spools/{id}/weight` | `200` updated spool or `404` |
+| `PUT` | `/api/spools/{id}` | `200` updated spool or `404` |
+| `DELETE` | `/api/spools/{id}` | `204` or `404` |
 
 ---
 
