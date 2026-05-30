@@ -11,6 +11,8 @@ public class Printer
     public string Protocol { get; set; } = string.Empty;
     public string? AccessCode { get; set; }
     public int? Port { get; set; }
+    public string? CloudEmail { get; set; }
+    public string? CloudPassword { get; set; }
     public bool HasAms { get; set; } = false;
     public int AmsSlotCount { get; set; } = 0;
     public bool IsActive { get; set; } = true;
