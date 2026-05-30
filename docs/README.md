@@ -12,7 +12,7 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 | [M1 — Data Model](#milestone-1--data-model) | Entities, migrations, repositories, seed data | ✅ Done |
 | [M2 — Spool API](#milestone-2--spool-api) | REST endpoints for spool management | ✅ Done |
 | [M3 — NFC Scan Flow](#milestone-3--nfc-scan-flow) | Scan endpoint, NfcScanService, SignalR | ✅ Done |
-| [M4 — Bambu MQTT](#milestone-4--bambu-mqtt) | MQTT listener, print-finish, gram deduction | ⬜ Not started |
+| [M4 — Bambu MQTT](#milestone-4--bambu-mqtt) | MQTT listener, print-finish, gram deduction | ✅ Done |
 | [M5 — Web UI](#milestone-5--web-ui) | Dashboard, scan page, Web NFC, QR fallback | ⬜ Not started |
 | [M6 — Alerts](#milestone-6--alerts) | Low stock threshold, ntfy / webhook | ⬜ Not started |
 | [M7 — AMS Support](#milestone-7--ams-support) | Multi-slot mapping, AMS MQTT, slot UI | ⬜ Not started |
@@ -101,18 +101,22 @@ Full development roadmap for the Spoolarr project. Each milestone links to its o
 
 ### Tasks
 
-- [ ] Install `MQTTnet` v5 in `Infrastructure`
-- [ ] Create `BambuMqttSettings` in `Infrastructure/Settings/`
-- [ ] Add `BambuMqtt` section to `appsettings.json` and `appsettings.Development.json`
-- [ ] Register settings in `Program.cs`
-- [ ] Create `MqttListenerService` in `Infrastructure/Services/` as `IHostedService`
-- [ ] Connect to printer via TLS using `bblp` credentials
-- [ ] Subscribe to `device/{serial}/report` topic
-- [ ] Parse `print.gcode_state == "FINISH"` and extract `print.filament_weight`
-- [ ] Deduct grams from active spool, floor at 0, save via `ISpoolRepository`
-- [ ] Log `PrintJob` to DB via `IPrintJobRepository`
-- [ ] Retry connection every 30 seconds if offline at startup or connection drops
-- [ ] Register `MqttListenerService` as hosted service in `Program.cs`
+- [x] Install `MQTTnet` v5 in `Infrastructure`
+- [x] Add `CloudEmail` + `CloudPassword` + `Port` to `Printer` entity + migration
+- [x] Create `BambuMqttService` in `Infrastructure/Services/` as `IHostedService`
+- [x] Connect via LAN (`bambu_lan`) or Cloud (`bambu_cloud`) — protocol driven by `Printer.Protocol`
+- [x] Cloud password stored encrypted via ASP.NET Core Data Protection
+- [x] Subscribe to `device/{serial}/report` topic
+- [x] Parse `print.gcode_state == "FINISH"` and extract `print.filament_weight`
+- [x] Deduct grams from active spool, floor at 0, save via `ISpoolRepository`
+- [x] Log `PrintJob` to DB via `IPrintJobRepository`
+- [x] Retry connection every 30 seconds if offline, no printer configured, or connection drops
+- [x] Register `BambuMqttService` as hosted service in `Program.cs`
+- [x] `PrinterStatus` DTO — state, progress, temps, layers
+- [x] `IPrinterStatusService` + `PrinterStatusService` — in-memory live status
+- [x] `PrinterHub` SignalR hub mapped to `/hubs/printer`
+- [x] Push `PrinterStatus` on every MQTT message via SignalR
+- [x] `GET /api/printers/status` — returns current status or `204`
 
 ---
 
