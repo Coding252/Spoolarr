@@ -39,6 +39,7 @@ builder.Services.AddScoped<INfcTagRepository, NfcTagRepository>();
 builder.Services.AddScoped<ISpoolService, SpoolService>();
 builder.Services.AddScoped<INfcScanService, NfcScanService>();
 builder.Services.AddScoped<IMqttMessageProcessor, MqttMessageProcessor>();
+builder.Services.AddScoped<IPrinterService, PrinterService>();
 builder.Services.AddSingleton<IPrinterStatusService, PrinterStatusService>();
 builder.Services.AddSingleton<IPrinterStatusPusher, PrinterStatusPusher>();
 builder.Services.AddDataProtection();
